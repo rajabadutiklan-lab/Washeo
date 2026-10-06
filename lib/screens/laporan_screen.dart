@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../widgets/bottom_nav.dart';
+import '../widgets/common.dart';
 
 // Layar Laporan. Sengaja TANPA BackdropFilter / blur supaya ringan:
 // semua kartu berwarna solid, grafik digambar langsung dengan CustomPainter.
@@ -11,10 +11,6 @@ const _red = Color(0xFFE8212B);
 const _ink = Color(0xFF14142B);
 const _muted = Color(0xFF7A7A8C);
 const _green = Color(0xFF16A34A);
-
-/// Lebar acuan desain. Isi layar disusun pada lebar ini lalu diskalakan
-/// seragam ke lebar HP, sehingga proporsinya sama di semua ukuran layar.
-const double _designWidth = 400;
 
 Color _w(double opacity) => Color.fromRGBO(255, 255, 255, opacity);
 
@@ -133,60 +129,21 @@ class _LaporanScreenState extends State<LaporanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final mq = MediaQuery.of(context);
-    return Scaffold(
-      extendBody: true,
-      backgroundColor: const Color(0xFFFDEEEF),
-      bottomNavigationBar: const EwashoBottomNav(current: 2),
-      body: Stack(
-        children: [
-          const Positioned.fill(child: RepaintBoundary(child: _Background())),
-          SafeArea(
-            bottom: false,
-            child: SingleChildScrollView(
-              padding: EdgeInsets.only(bottom: 124 + mq.padding.bottom),
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: SizedBox(
-                  width: math.min(mq.size.width, 520),
-                  child: MediaQuery(
-                    data: mq.copyWith(textScaler: TextScaler.noScaling),
-                    child: FittedBox(
-                      fit: BoxFit.fitWidth,
-                      alignment: Alignment.topCenter,
-                      child: SizedBox(
-                        width: _designWidth,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
-                          child: _content(context),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    return EwashoPage(current: 2, redHeight: 150, child: _content(context));
   }
 
   Widget _content(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _Header(
+        EwashoHeader(
           outlet: _outlet,
           onOutletChanged: (v) => setState(() => _outlet = v),
-          onCalendar: _pilihTanggal,
+          actionIcon: Icons.calendar_month_rounded,
+          onAction: _pilihTanggal,
         ),
         const SizedBox(height: 14),
-        Padding(
-          padding: const EdgeInsets.only(left: 8),
-          child: Text('LAPORAN',
-              style: _t(24, w: FontWeight.w800, c: Colors.white, h: 1.1)),
-        ),
+        const PageTitle('LAPORAN'),
         const SizedBox(height: 12),
         Row(
           children: [
@@ -320,69 +277,6 @@ class _LaporanScreenState extends State<LaporanScreen> {
 // Latar & kartu (solid, tanpa blur)
 // ---------------------------------------------------------------------------
 
-class _Background extends StatelessWidget {
-  const _Background();
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFE5202A),
-            Color(0xFFF03E46),
-            Color(0xFFFBD0D3),
-            Color(0xFFFDEEEF),
-          ],
-          stops: [0, .17, .31, .55],
-        ),
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            top: -70,
-            right: -50,
-            child: Container(
-              width: 240,
-              height: 240,
-              decoration:
-                  BoxDecoration(shape: BoxShape.circle, color: _w(.08)),
-            ),
-          ),
-          for (final b in const [
-            // (top, left, right, ukuran, warna) - bercak lembut di balik kartu
-            (330.0, -110.0, null, 300.0, Color(0x33FF7A82)),
-            (520.0, null, -120.0, 320.0, Color(0x2EFF8A90)),
-            (760.0, -60.0, null, 260.0, Color(0x30FF6F78)),
-          ])
-            Positioned(
-              top: b.$1,
-              left: b.$2,
-              right: b.$3,
-              child: Container(
-                width: b.$4,
-                height: b.$4,
-                decoration: BoxDecoration(shape: BoxShape.circle, color: b.$5),
-              ),
-            ),
-          Positioned(
-            top: 70,
-            left: -90,
-            child: Container(
-              width: 220,
-              height: 220,
-              decoration:
-                  BoxDecoration(shape: BoxShape.circle, color: _w(.06)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _Card extends StatelessWidget {
   const _Card({required this.child, this.padding = const EdgeInsets.all(14)});
   final Widget child;
@@ -392,19 +286,13 @@ class _Card extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: padding,
-      // Kaca tipis tanpa blur: isi putih tembus pandang + kilau gradient +
-      // garis tepi terang. Latar di belakangnya samar-samar terlihat.
       decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xEBFFFFFF), Color(0xC4FFF6F6)],
-        ),
-        border: Border.all(color: const Color(0xE6FFFFFF), width: 1.2),
+        border: Border.all(color: const Color(0xFFEDEEF1)),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x12B00014),
+            color: Color(0x141D2433),
             blurRadius: 10,
             offset: Offset(0, 4),
           ),
@@ -418,113 +306,6 @@ class _Card extends StatelessWidget {
 // ---------------------------------------------------------------------------
 // Header
 // ---------------------------------------------------------------------------
-
-class _Header extends StatelessWidget {
-  const _Header({
-    required this.outlet,
-    required this.onOutletChanged,
-    required this.onCalendar,
-  });
-
-  final String outlet;
-  final ValueChanged<String> onOutletChanged;
-  final VoidCallback onCalendar;
-
-  static const _outlets = ['Outlet Utama', 'Outlet Cabang 1', 'Outlet Cabang 2'];
-
-  @override
-  Widget build(BuildContext context) {
-    final pill = BoxDecoration(
-      color: _w(.16),
-      borderRadius: BorderRadius.circular(22),
-      border: Border.all(color: _w(.40)),
-    );
-    return Row(
-      children: [
-        const SizedBox(width: 6),
-        Image.asset(
-          'assets/images/logo_ewasho.png',
-          width: 46,
-          height: 46,
-          errorBuilder: (_, __, ___) => Container(
-            width: 46,
-            height: 46,
-            alignment: Alignment.center,
-            decoration:
-                const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-            child: const Text(
-              'e',
-              style: TextStyle(
-                color: _red,
-                fontSize: 29,
-                height: 1,
-                fontWeight: FontWeight.w800,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 7),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('EWASHO',
-                style: _t(20, w: FontWeight.w800, c: Colors.white, h: 1.05)
-                    .copyWith(letterSpacing: .8)),
-            Text('KASIR LAUNDRY',
-                style: _t(6.8, w: FontWeight.w500, c: Colors.white)
-                    .copyWith(letterSpacing: 2.9)),
-          ],
-        ),
-        const Spacer(),
-        PopupMenuButton<String>(
-          onSelected: onOutletChanged,
-          position: PopupMenuPosition.under,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          itemBuilder: (_) => [
-            for (final o in _outlets) PopupMenuItem(value: o, child: Text(o)),
-          ],
-          child: Container(
-            height: 40,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: pill,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.storefront_rounded,
-                    color: Colors.white, size: 19),
-                const SizedBox(width: 7),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 96),
-                  child: Text(outlet,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: _t(12, w: FontWeight.w500, c: Colors.white)),
-                ),
-                const SizedBox(width: 6),
-                const Icon(Icons.keyboard_arrow_down_rounded,
-                    color: Colors.white, size: 19),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        GestureDetector(
-          onTap: onCalendar,
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: pill,
-            child: const Icon(Icons.calendar_month_rounded,
-                color: Colors.white, size: 19),
-          ),
-        ),
-      ],
-    );
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Tab periode, pilih tanggal, toggle grafik
@@ -625,7 +406,7 @@ class _Toggle extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1E9EA),
+        color: const Color(0xFFF1F2F4),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -688,9 +469,8 @@ class _StatCard extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: const Color(0xFFFFF0F1),
                   borderRadius: BorderRadius.circular(13),
-                  border: Border.all(color: const Color(0xFFFBE4E5)),
                 ),
                 child: Icon(icon, color: _red, size: 24),
               ),
@@ -812,7 +592,7 @@ class _BarChartPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final chart = Rect.fromLTRB(left, top, size.width, size.height - bottom);
     final grid = Paint()
-      ..color = const Color(0xFFF3DFE0)
+      ..color = const Color(0xFFECEEF1)
       ..strokeWidth = 1;
 
     final steps = yLabels.length - 1;
@@ -966,7 +746,7 @@ class _LayananRow extends StatelessWidget {
                       height: 5,
                       alignment: Alignment.centerLeft,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF2E6E7),
+                        color: const Color(0xFFEEF0F3),
                         borderRadius: BorderRadius.circular(3),
                       ),
                       child: FractionallySizedBox(
@@ -1155,7 +935,7 @@ class _RekapCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             decoration: BoxDecoration(
-              color: const Color(0xFFF5ECEC),
+              color: const Color(0xFFF3F4F6),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -1168,7 +948,7 @@ class _RekapCard extends StatelessWidget {
             ),
           ),
           for (var i = 0; i < _rekap.length; i++) ...[
-            if (i > 0) const Divider(height: 1, color: Color(0xFFF3E3E4)),
+            if (i > 0) const Divider(height: 1, color: Color(0xFFEEEFF2)),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               child: Row(

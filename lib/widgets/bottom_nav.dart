@@ -3,28 +3,21 @@ import 'package:flutter/material.dart';
 import '../screens/beranda_screen.dart';
 import '../screens/laporan_screen.dart';
 import '../screens/pengaturan_screen.dart';
+import 'common.dart';
 
 /// Warna ikon menu bawah yang tidak aktif. Tombol scan memakai warna yang sama.
 const kNavGrey = Color(0xFF667085);
-const _navRed = Color(0xFFE8212B);
 
-const _navItems = [
-  (Icons.home_outlined, 'Beranda'),
-  (Icons.receipt_long_outlined, 'Pesanan'),
-  (Icons.bar_chart_rounded, 'Laporan'),
-  (Icons.settings_outlined, 'Pengaturan'),
-  (Icons.person_outline_rounded, 'Profil'),
+// Indeks tab: 0 Beranda, 1 Pesanan, 2 Laporan, 3 Pengaturan, 4 Profil.
+// Nilai -1 = tombol Scan (bukan tab, sejajar dengan menu lain).
+const _slots = [
+  (0, Icons.home_outlined, 'Beranda'),
+  (1, Icons.receipt_long_outlined, 'Pesanan'),
+  (-1, Icons.qr_code_scanner_rounded, 'Scan'),
+  (2, Icons.bar_chart_rounded, 'Laporan'),
+  (3, Icons.settings_outlined, 'Pengaturan'),
+  (4, Icons.person_outline_rounded, 'Profil'),
 ];
-
-void _toast(BuildContext context, String text) {
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(
-      content: Text(text),
-      behavior: SnackBarBehavior.floating,
-      duration: const Duration(milliseconds: 900),
-    ));
-}
 
 /// Pindah tab. Indeks: 0 Beranda, 1 Pesanan, 2 Laporan, 3 Pengaturan, 4 Profil.
 void goTab(BuildContext context, int from, int to) {
@@ -37,7 +30,7 @@ void goTab(BuildContext context, int from, int to) {
   };
   if (page == null) {
     // TODO: layar Pesanan dan Profil belum dibuat.
-    _toast(context, 'Buka ${_navItems[to].$2}');
+    showInfo(context, to == 1 ? 'Buka Pesanan' : 'Buka Profil');
     return;
   }
   Navigator.of(context).pushAndRemoveUntil(
@@ -56,29 +49,36 @@ class EwashoBottomNav extends StatelessWidget {
 
   final int current;
 
-  Widget _item(BuildContext context, int i) {
-    final active = i == current;
-    final color = active ? _navRed : kNavGrey;
+  Widget _item(BuildContext context, (int, IconData, String) slot) {
+    final active = slot.$1 == current;
+    final color = active ? kRed : kNavGrey;
     return Expanded(
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () => goTab(context, current, i),
+        onTap: () {
+          if (slot.$1 < 0) {
+            // TODO: buka layar scan.
+            showInfo(context, 'Buka Scan Pesanan');
+          } else {
+            goTab(context, current, slot.$1);
+          }
+        },
         child: Center(
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 7),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
             decoration: BoxDecoration(
-              color: active ? const Color(0xFFFFE4E6) : null,
-              borderRadius: BorderRadius.circular(16),
+              color: active ? const Color(0xFFFFE9EA) : null,
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(_navItems[i].$1, color: color, size: 24),
+                Icon(slot.$2, color: color, size: 24),
                 const SizedBox(height: 2),
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    _navItems[i].$2,
+                    slot.$3,
                     maxLines: 1,
                     style: TextStyle(
                       color: color,
@@ -101,70 +101,22 @@ class EwashoBottomNav extends StatelessWidget {
     final inset = mq.padding.bottom;
     return MediaQuery(
       data: mq.copyWith(textScaler: TextScaler.noScaling),
-      child: SizedBox(
-        height: 106 + inset,
-        child: Stack(
-          alignment: Alignment.bottomCenter,
-          children: [
-            Container(
-              height: 76 + inset,
-              padding: EdgeInsets.only(left: 4, right: 4, bottom: inset),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0x1A800010),
-                    blurRadius: 14,
-                    offset: Offset(0, -4),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Row(
-                      children: [_item(context, 0), _item(context, 1)],
-                    ),
-                  ),
-                  const SizedBox(width: 78),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        _item(context, 2),
-                        _item(context, 3),
-                        _item(context, 4),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              top: 0,
-              child: GestureDetector(
-                onTap: () => _toast(context, 'Buka Scan Pesanan'),
-                child: Container(
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: kNavGrey,
-                    border: Border.all(color: Colors.white, width: 4),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x33344054),
-                        blurRadius: 12,
-                        offset: Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(Icons.qr_code_scanner_rounded,
-                      color: Colors.white, size: 32),
-                ),
-              ),
+      child: Container(
+        height: 68 + inset,
+        padding: EdgeInsets.only(left: 4, right: 4, bottom: inset),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+          boxShadow: [
+            BoxShadow(
+              color: Color(0x1A1D2433),
+              blurRadius: 14,
+              offset: Offset(0, -4),
             ),
           ],
+        ),
+        child: Row(
+          children: [for (final s in _slots) _item(context, s)],
         ),
       ),
     );
