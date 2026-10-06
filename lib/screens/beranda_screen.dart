@@ -38,16 +38,19 @@ class _BerandaScreenState extends State<BerandaScreen> {
           const SizedBox(height: 14),
           _OmsetCard(
             omset: 1250000,
-            onPesananBaru: () => _open('Pesanan Baru'),
             aksi: [
-              _Aksi(Icons.receipt_long_outlined, 'Pesanan', kTeal,
-                  () => _open('Pesanan')),
-              _Aksi(Icons.qr_code_scanner_rounded, 'Scan', kOrange,
-                  () => _open('Scan Pesanan')),
-              _Aksi(Icons.bar_chart_rounded, 'Laporan', kTeal,
-                  () => _open('Laporan')),
-              _Aksi(Icons.settings_outlined, 'Pengaturan', kOrange,
-                  () => _open('Pengaturan')),
+              _Aksi(Icons.post_add_rounded, 'Tambah Transaksi', kTeal,
+                  () => _open('Tambah Transaksi')),
+              _Aksi(Icons.manage_search_rounded, 'Cari Transaksi', kOrange,
+                  () => _open('Cari Transaksi')),
+              _Aksi(Icons.local_shipping_outlined, 'Kurir', kTeal,
+                  () => _open('Kurir')),
+              _Aksi(Icons.people_outline_rounded, 'Pelanggan', kOrange,
+                  () => _open('Pelanggan')),
+              _Aksi(Icons.today_outlined, 'Hari Ini', kTeal,
+                  () => _open('Hari Ini')),
+              _Aksi(Icons.smart_toy_outlined, 'Chatbot', kOrange,
+                  () => _open('Chatbot')),
             ],
           ),
           const SizedBox(height: 12),
@@ -73,12 +76,10 @@ class _Aksi {
 class _OmsetCard extends StatefulWidget {
   const _OmsetCard({
     required this.omset,
-    required this.onPesananBaru,
     required this.aksi,
   });
 
   final int omset;
-  final VoidCallback onPesananBaru;
   final List<_Aksi> aksi;
 
   @override
@@ -139,55 +140,40 @@ class _OmsetCardState extends State<_OmsetCard> {
                     ],
                   ),
                 ),
-                const SizedBox(width: 10),
-                GestureDetector(
-                  onTap: widget.onPesananBaru,
-                  child: Container(
-                    height: 34,
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(17),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.add_rounded,
-                            color: Color(0xFF363636), size: 17),
-                        const SizedBox(width: 6),
-                        Text('Pesanan Baru',
-                            style: ts(12,
-                                w: FontWeight.w600,
-                                c: const Color(0xFF363636))),
-                      ],
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
           Container(
             color: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Row(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Column(
               children: [
-                for (final a in widget.aksi)
-                  Expanded(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: a.onTap,
-                      child: Column(
-                        children: [
-                          Icon(a.icon, color: a.color, size: 30),
-                          const SizedBox(height: 6),
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(a.label,
-                                style: ts(12.5, c: kSlate, h: 1.2)),
+                for (var r = 0; r < widget.aksi.length; r += 3)
+                  Row(
+                    children: [
+                      for (final a in widget.aksi.skip(r).take(3))
+                        Expanded(
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: a.onTap,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 4),
+                              child: Column(
+                                children: [
+                                  Icon(a.icon, color: a.color, size: 30),
+                                  const SizedBox(height: 6),
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(a.label,
+                                        style: ts(12.5, c: kSlate, h: 1.2)),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
+                    ],
                   ),
               ],
             ),
