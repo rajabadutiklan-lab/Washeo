@@ -57,9 +57,6 @@ class _PengaturanScreenState extends State<PengaturanScreen> {
             actionIcon: Icons.notifications_rounded,
             onAction: () => _open('Notifikasi'),
           ),
-          const SizedBox(height: 18),
-          const PageTitle('Pengaturan',
-              subtitle: 'Kelola sistem sesuai kebutuhan usaha Anda'),
           const SizedBox(height: 14),
           for (var i = 0; i < _menus.length; i += 2) ...[
             if (i > 0) const SizedBox(height: 8),

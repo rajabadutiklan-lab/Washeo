@@ -52,30 +52,6 @@ class _BerandaScreenState extends State<BerandaScreen> {
           ),
           const SizedBox(height: 12),
           _BannerCarousel(onTap: _open),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: StatCard(
-                  icon: Icons.calendar_month_outlined,
-                  label: 'Omset Bulanan',
-                  value: rupiah(28750000),
-                  percent: '+8%',
-                  caption: 'dari bulan lalu',
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: StatCard(
-                  icon: Icons.receipt_long_outlined,
-                  label: 'Pesanan Hari Ini',
-                  value: '48',
-                  percent: '+18%',
-                  caption: 'dari kemarin',
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );
