@@ -36,12 +36,14 @@ class _BerandaScreenState extends State<BerandaScreen> {
             onAction: () => _open('Notifikasi'),
           ),
           const SizedBox(height: 14),
+          _BannerCarousel(onTap: _open),
+          const SizedBox(height: 12),
           _OmsetCard(
             omset: 1250000,
             aksi: [
-              _Aksi(Icons.post_add_rounded, 'Tambah Transaksi', kTeal,
+              _Aksi(Icons.post_add_rounded, 'Tambah\nTransaksi', kTeal,
                   () => _open('Tambah Transaksi')),
-              _Aksi(Icons.manage_search_rounded, 'Cari Transaksi', kOrange,
+              _Aksi(Icons.manage_search_rounded, 'Cari\nTransaksi', kOrange,
                   () => _open('Cari Transaksi')),
               _Aksi(Icons.local_shipping_outlined, 'Kurir', kTeal,
                   () => _open('Kurir')),
@@ -53,8 +55,6 @@ class _BerandaScreenState extends State<BerandaScreen> {
                   () => _open('Chatbot')),
             ],
           ),
-          const SizedBox(height: 12),
-          _BannerCarousel(onTap: _open),
         ],
       ),
     );
@@ -161,12 +161,24 @@ class _OmsetCardState extends State<_OmsetCard> {
                                   vertical: 10, horizontal: 4),
                               child: Column(
                                 children: [
-                                  Icon(a.icon, color: a.color, size: 30),
-                                  const SizedBox(height: 6),
-                                  FittedBox(
-                                    fit: BoxFit.scaleDown,
+                                  Container(
+                                    width: 56,
+                                    height: 56,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(color: kLine),
+                                    ),
+                                    child: Icon(a.icon,
+                                        color: a.color, size: 28),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  SizedBox(
+                                    height: 34,
                                     child: Text(a.label,
-                                        style: ts(12.5, c: kSlate, h: 1.2)),
+                                        textAlign: TextAlign.center,
+                                        maxLines: 2,
+                                        style: ts(12, c: kSlate, h: 1.25)),
                                   ),
                                 ],
                               ),
