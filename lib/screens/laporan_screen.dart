@@ -9,7 +9,6 @@ const _red = Color(0xFFE8212B);
 const _ink = Color(0xFF14142B);
 const _muted = Color(0xFF7A7A8C);
 const _green = Color(0xFF16A34A);
-const _cardColor = Color(0xFFFFF8F8);
 
 /// Lebar acuan desain. Isi layar disusun pada lebar ini lalu diskalakan
 /// seragam ke lebar HP, sehingga proporsinya sama di semua ukuran layar.
@@ -359,6 +358,22 @@ class _Background extends StatelessWidget {
                   BoxDecoration(shape: BoxShape.circle, color: _w(.08)),
             ),
           ),
+          for (final b in const [
+            // (top, left, right, ukuran, warna) - bercak lembut di balik kartu
+            (330.0, -110.0, null, 300.0, Color(0x33FF7A82)),
+            (520.0, null, -120.0, 320.0, Color(0x2EFF8A90)),
+            (760.0, -60.0, null, 260.0, Color(0x30FF6F78)),
+          ])
+            Positioned(
+              top: b.$1,
+              left: b.$2,
+              right: b.$3,
+              child: Container(
+                width: b.$4,
+                height: b.$4,
+                decoration: BoxDecoration(shape: BoxShape.circle, color: b.$5),
+              ),
+            ),
           Positioned(
             top: 70,
             left: -90,
@@ -384,13 +399,19 @@ class _Card extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: padding,
+      // Kaca tipis tanpa blur: isi putih tembus pandang + kilau gradient +
+      // garis tepi terang. Latar di belakangnya samar-samar terlihat.
       decoration: BoxDecoration(
-        color: _cardColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white, width: 1),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xEBFFFFFF), Color(0xC4FFF6F6)],
+        ),
+        border: Border.all(color: const Color(0xE6FFFFFF), width: 1.2),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x14B00014),
+            color: Color(0x12B00014),
             blurRadius: 10,
             offset: Offset(0, 4),
           ),
