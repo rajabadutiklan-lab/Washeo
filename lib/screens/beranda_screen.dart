@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import 'laporan_screen.dart';
+
 // ---------------------------------------------------------------------------
 // Warna & helper
 // ---------------------------------------------------------------------------
@@ -39,12 +41,20 @@ class BerandaScreen extends StatefulWidget {
 }
 
 class _BerandaScreenState extends State<BerandaScreen> {
-  int _navIndex = 0;
+  final int _navIndex = 0;
   String _outlet = 'Outlet Utama';
   final _outlets = const ['Outlet Utama', 'Outlet Cabang 1', 'Outlet Cabang 2'];
 
   // TODO: ganti dengan navigasi ke layar masing-masing.
   void _open(String name) {
+    if (name == 'Laporan') {
+      Navigator.of(context).push(PageRouteBuilder(
+        pageBuilder: (_, __, ___) => const LaporanScreen(),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+      ));
+      return;
+    }
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(
@@ -62,7 +72,6 @@ class _BerandaScreenState extends State<BerandaScreen> {
       bottomNavigationBar: _BottomNav(
         index: _navIndex,
         onTap: (i) {
-          setState(() => _navIndex = i);
           if (i != 0) _open(const ['Beranda', 'Pesanan', 'Laporan', 'Profil'][i]);
         },
         onScan: () => _open('Scan Pesanan'),
