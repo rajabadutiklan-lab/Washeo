@@ -5,9 +5,6 @@ import '../screens/laporan_screen.dart';
 import '../screens/pengaturan_screen.dart';
 import 'common.dart';
 
-/// Warna ikon menu bawah yang tidak aktif. Tombol scan memakai warna yang sama.
-const kNavGrey = Color(0xFF667085);
-
 // Indeks tab: 0 Beranda, 1 Pesanan, 2 Laporan, 3 Pengaturan, 4 Profil.
 // Nilai -1 = tombol Scan (bukan tab, sejajar dengan menu lain).
 const _slots = [
@@ -43,7 +40,7 @@ void goTab(BuildContext context, int from, int to) {
   );
 }
 
-/// Menu bawah yang dipakai semua layar utama.
+/// Menu bawah datar yang dipakai semua layar utama.
 class EwashoBottomNav extends StatelessWidget {
   const EwashoBottomNav({super.key, required this.current});
 
@@ -51,7 +48,7 @@ class EwashoBottomNav extends StatelessWidget {
 
   Widget _item(BuildContext context, (int, IconData, String) slot) {
     final active = slot.$1 == current;
-    final color = active ? kRed : kNavGrey;
+    final color = active ? kRed : kSlate;
     return Expanded(
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -63,33 +60,27 @@ class EwashoBottomNav extends StatelessWidget {
             goTab(context, current, slot.$1);
           }
         },
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-            decoration: BoxDecoration(
-              color: active ? const Color(0xFFFFE9EA) : null,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(slot.$2, color: color, size: 24),
-                const SizedBox(height: 2),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    slot.$3,
-                    maxLines: 1,
-                    style: TextStyle(
-                      color: color,
-                      fontSize: 10,
-                      fontWeight: active ? FontWeight.w600 : FontWeight.w400,
-                    ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(slot.$2, color: color, size: 26),
+            const SizedBox(height: 3),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  slot.$3,
+                  maxLines: 1,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 12,
+                    fontWeight: active ? FontWeight.w700 : FontWeight.w400,
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -102,18 +93,11 @@ class EwashoBottomNav extends StatelessWidget {
     return MediaQuery(
       data: mq.copyWith(textScaler: TextScaler.noScaling),
       child: Container(
-        height: 68 + inset,
+        height: 64 + inset,
         padding: EdgeInsets.only(left: 4, right: 4, bottom: inset),
         decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
-          boxShadow: [
-            BoxShadow(
-              color: Color(0x1A1D2433),
-              blurRadius: 14,
-              offset: Offset(0, -4),
-            ),
-          ],
+          border: Border(top: BorderSide(color: kLine)),
         ),
         child: Row(
           children: [for (final s in _slots) _item(context, s)],

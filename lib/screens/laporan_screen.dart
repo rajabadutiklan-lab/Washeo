@@ -7,16 +7,14 @@ import '../widgets/common.dart';
 // Layar Laporan. Sengaja TANPA BackdropFilter / blur supaya ringan:
 // semua kartu berwarna solid, grafik digambar langsung dengan CustomPainter.
 
-const _red = Color(0xFFE8212B);
-const _ink = Color(0xFF14142B);
-const _muted = Color(0xFF7A7A8C);
-const _green = Color(0xFF16A34A);
-
-Color _w(double opacity) => Color.fromRGBO(255, 255, 255, opacity);
+const _red = Color(0xFFE1251A);
+const _ink = Color(0xFF4C4C4C);
+const _muted = Color(0xFF747474);
+const _green = Color(0xFF00A29B);
 
 TextStyle _t(double size,
         {FontWeight w = FontWeight.w400, Color c = _ink, double? h}) =>
-    TextStyle(fontSize: size, fontWeight: w, color: c, height: h);
+    TextStyle(fontSize: size * 1.08, fontWeight: w, color: c, height: h);
 
 String _rp(int value) {
   final s = value.toString();
@@ -52,13 +50,13 @@ class _Layanan {
 }
 
 const _layanan = [
-  _Layanan('Cuci Setrika', 42, 120, Icons.layers_rounded, Color(0xFFFFE9D6),
-      Color(0xFFF97316)),
-  _Layanan('Cuci', 28, 80, Icons.checkroom_rounded, Color(0xFFDFEBFF),
-      Color(0xFF2563EB)),
-  _Layanan('Setrika', 18, 52, Icons.iron_rounded, Color(0xFFECE3FF),
-      Color(0xFF7C3AED)),
-  _Layanan('Express', 12, 35, Icons.bolt_rounded, Color(0xFFFFE1E3), _red),
+  _Layanan('Cuci Setrika', 42, 120, Icons.layers_outlined, Color(0xFFF3F4F8),
+      Color(0xFFD57624)),
+  _Layanan('Cuci', 28, 80, Icons.checkroom_rounded, Color(0xFFF3F4F8),
+      Color(0xFF00A29B)),
+  _Layanan('Setrika', 18, 52, Icons.iron_outlined, Color(0xFFF3F4F8),
+      Color(0xFF465363)),
+  _Layanan('Express', 12, 35, Icons.bolt_rounded, Color(0xFFF3F4F8), _red),
 ];
 
 class _Bayar {
@@ -71,9 +69,9 @@ class _Bayar {
 
 const _bayar = [
   _Bayar('QRIS', 52, 650000, _red),
-  _Bayar('Tunai', 28, 350000, Color(0xFFFF9EA2)),
-  _Bayar('Transfer', 15, 190000, Color(0xFF7FA6F8)),
-  _Bayar('Lainnya', 5, 60000, Color(0xFFA9A9B6)),
+  _Bayar('Tunai', 28, 350000, Color(0xFF00A29B)),
+  _Bayar('Transfer', 15, 190000, Color(0xFFD57624)),
+  _Bayar('Lainnya', 5, 60000, Color(0xFFADB3BF)),
 ];
 
 class _Rekap {
@@ -129,7 +127,7 @@ class _LaporanScreenState extends State<LaporanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return EwashoPage(current: 2, redHeight: 150, child: _content(context));
+    return EwashoPage(current: 2, child: _content(context));
   }
 
   Widget _content(BuildContext context) {
@@ -139,11 +137,11 @@ class _LaporanScreenState extends State<LaporanScreen> {
         EwashoHeader(
           outlet: _outlet,
           onOutletChanged: (v) => setState(() => _outlet = v),
-          actionIcon: Icons.calendar_month_rounded,
+          actionIcon: Icons.calendar_month_outlined,
           onAction: _pilihTanggal,
         ),
         const SizedBox(height: 14),
-        const PageTitle('LAPORAN'),
+        const PageTitle('Laporan'),
         const SizedBox(height: 12),
         Row(
           children: [
@@ -288,15 +286,7 @@ class _Card extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFEDEEF1)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x141D2433),
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(12),
       ),
       child: child,
     );
@@ -325,7 +315,7 @@ class _Tabs extends StatelessWidget {
       height: 38,
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color: _w(.22),
+        color: const Color(0xFFE5E8ED),
         borderRadius: BorderRadius.circular(19),
       ),
       child: Row(
@@ -351,7 +341,7 @@ class _Tabs extends StatelessWidget {
                       _labels[i],
                       style: i == index
                           ? _t(12, w: FontWeight.w600, c: _red)
-                          : _t(12, w: FontWeight.w500, c: Colors.white),
+                          : _t(12, w: FontWeight.w500, c: const Color(0xFF465363)),
                     ),
                   ),
                 ),
@@ -378,13 +368,14 @@ class _DatePill extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(19),
+          border: Border.all(color: const Color(0xFFADB3BF)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.calendar_month_rounded, color: _red, size: 16),
             const SizedBox(width: 7),
-            Text(text, style: _t(11, c: const Color(0xFF55556A))),
+            Text(text, style: _t(11, c: const Color(0xFF465363))),
             const SizedBox(width: 5),
             const Icon(Icons.keyboard_arrow_down_rounded,
                 color: _red, size: 17),
@@ -469,7 +460,7 @@ class _StatCard extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFF0F1),
+                  color: const Color(0xFFF3F4F8),
                   borderRadius: BorderRadius.circular(13),
                 ),
                 child: Icon(icon, color: _red, size: 24),
@@ -517,10 +508,10 @@ class _MiniBars extends StatelessWidget {
   Widget build(BuildContext context) {
     const heights = [8.0, 13.0, 18.0, 24.0];
     const colors = [
-      Color(0xFFFFB3B6),
-      Color(0xFFFF9499),
-      Color(0xFFFF7078),
-      Color(0xFFF2434B),
+      Color(0xFFF6C4C0),
+      Color(0xFFEF9189),
+      Color(0xFFE85B51),
+      Color(0xFFE1251A),
     ];
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -616,14 +607,14 @@ class _BarChartPainter extends CustomPainter {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: sel
-                ? const [Color(0xFFFF4A52), _red]
-                : const [Color(0xFFFFB9BC), Color(0xFFFF9398)],
+                ? const [_red, _red]
+                : const [Color(0xFFDDE3EA), Color(0xFFDDE3EA)],
           ).createShader(r);
         canvas.drawRRect(
           RRect.fromRectAndCorners(
             r,
-            topLeft: const Radius.circular(5),
-            topRight: const Radius.circular(5),
+            topLeft: const Radius.circular(3),
+            topRight: const Radius.circular(3),
           ),
           paint,
         );
@@ -754,7 +745,7 @@ class _LayananRow extends StatelessWidget {
                             (data.persen / 60).clamp(0.0, 1.0).toDouble(),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF2434B),
+                            color: const Color(0xFFE1251A),
                             borderRadius: BorderRadius.circular(3),
                           ),
                         ),
@@ -982,16 +973,16 @@ class _Chips extends StatelessWidget {
 
   static const _nama = ['QRIS', 'Tunai', 'Transfer', 'Lainnya'];
   static const _bg = [
-    Color(0xFFFFE1E3),
-    Color(0xFFDDF5E4),
-    Color(0xFFDCE8FF),
-    Color(0xFFEDEDF0),
+    Color(0xFFFCE6E4),
+    Color(0xFFDFF3F2),
+    Color(0xFFFAEDDF),
+    Color(0xFFF3F4F8),
   ];
   static const _fg = [
-    _ink,
-    Color(0xFF15803D),
-    Color(0xFF2563EB),
-    Color(0xFF55556A),
+    _red,
+    Color(0xFF016B67),
+    Color(0xFFB5611A),
+    Color(0xFF747474),
   ];
 
   Widget _chip(int i) => Container(
@@ -999,7 +990,7 @@ class _Chips extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
         decoration: BoxDecoration(
           color: _bg[i],
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(3),
         ),
         child: Text.rich(
           TextSpan(

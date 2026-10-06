@@ -1,19 +1,25 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'bottom_nav.dart';
 
-// Bagian yang dipakai bersama semua layar: warna, header, motif, kartu.
-// Tidak ada blur di sini supaya ringan di HP kelas bawah.
+// Bagian yang dipakai bersama semua layar. Gaya: datar dan bersih -
+// latar terang, kartu putih tanpa bayangan, tanpa gradient, tanpa blur.
 
-const kRed = Color(0xFFE8212B);
-const kInk = Color(0xFF14142B);
-const kMuted = Color(0xFF7A7A8C);
-const kGreen = Color(0xFF16A34A);
-
-/// Warna dasar layar: abu sangat muda yang netral, bukan merah muda.
-const kBody = Color(0xFFF6F7F9);
+const kRed = Color(0xFFE1251A);
+const kInk = Color(0xFF4C4C4C);
+const kMuted = Color(0xFF747474);
+const kSlate = Color(0xFF465363);
+const kTeal = Color(0xFF00A29B);
+const kTealDark = Color(0xFF016B67);
+const kOrange = Color(0xFFD57624);
+const kDark = Color(0xFF4E4E4E);
+const kBody = Color(0xFFF4F8FB);
+const kLine = Color(0xFFE6E6E6);
+const kTile = Color(0xFFF3F4F8);
+const kOutline = Color(0xFFADB3BF);
 
 /// Lebar acuan desain. Isi layar disusun pada lebar ini lalu diskalakan
 /// seragam ke lebar HP.
@@ -23,7 +29,7 @@ Color wOp(double opacity) => Color.fromRGBO(255, 255, 255, opacity);
 
 TextStyle ts(double size,
         {FontWeight w = FontWeight.w400, Color c = kInk, double? h}) =>
-    TextStyle(fontSize: size, fontWeight: w, color: c, height: h);
+    TextStyle(fontSize: size * 1.08, fontWeight: w, color: c, height: h);
 
 String rupiah(int value) {
   final s = value.toString();
@@ -46,16 +52,11 @@ void showInfo(BuildContext context, String text) {
 }
 
 // ---------------------------------------------------------------------------
-// Kerangka layar: motif header merah di atas, badan terang, menu bawah
+// Kerangka layar: latar terang polos + menu bawah
 // ---------------------------------------------------------------------------
 
 class EwashoPage extends StatelessWidget {
-  const EwashoPage({
-    super.key,
-    required this.current,
-    required this.child,
-    this.redHeight = 150,
-  });
+  const EwashoPage({super.key, required this.current, required this.child});
 
   /// Indeks menu bawah yang aktif.
   final int current;
@@ -63,51 +64,37 @@ class EwashoPage extends StatelessWidget {
   /// Isi layar, disusun pada lebar [kDesignWidth].
   final Widget child;
 
-  /// Tinggi area merah (satuan desain) sebelum memudar ke warna badan.
-  final double redHeight;
-
-  static const double _fade = 70;
-
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context);
     final width = math.min(mq.size.width, 520.0);
-    final scale = width / kDesignWidth;
-    final motifHeight = mq.padding.top + (redHeight + _fade) * scale;
-    return Scaffold(
-      extendBody: true,
-      backgroundColor: kBody,
-      bottomNavigationBar: EwashoBottomNav(current: current),
-      body: Stack(
-        children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: motifHeight,
-            child: RepaintBoundary(
-              child: HeaderMotif(solid: 1 - (_fade * scale) / motifHeight),
-            ),
-          ),
-          SafeArea(
-            bottom: false,
-            child: SingleChildScrollView(
-              padding: EdgeInsets.only(bottom: 88 + mq.padding.bottom),
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: SizedBox(
-                  width: width,
-                  child: MediaQuery(
-                    data: mq.copyWith(textScaler: TextScaler.noScaling),
-                    child: FittedBox(
-                      fit: BoxFit.fitWidth,
-                      alignment: Alignment.topCenter,
-                      child: SizedBox(
-                        width: kDesignWidth,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
-                          child: child,
-                        ),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+      child: Scaffold(
+        backgroundColor: kBody,
+        bottomNavigationBar: EwashoBottomNav(current: current),
+        body: SafeArea(
+          bottom: false,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: SizedBox(
+                width: width,
+                child: MediaQuery(
+                  data: mq.copyWith(textScaler: TextScaler.noScaling),
+                  child: FittedBox(
+                    fit: BoxFit.fitWidth,
+                    alignment: Alignment.topCenter,
+                    child: SizedBox(
+                      width: kDesignWidth,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+                        child: child,
                       ),
                     ),
                   ),
@@ -115,65 +102,8 @@ class EwashoPage extends StatelessWidget {
               ),
             ),
           ),
-        ],
+        ),
       ),
-    );
-  }
-}
-
-/// Motif header yang sama di semua layar: gradient merah dengan dua
-/// lengkung lembut, memudar ke warna badan di bagian bawah.
-class HeaderMotif extends StatelessWidget {
-  const HeaderMotif({super.key, required this.solid});
-
-  /// Bagian (0..1) dari tinggi yang tetap merah penuh sebelum memudar.
-  final double solid;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        const DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFFFF4A52), Color(0xFFE8212B), Color(0xFFD9141F)],
-            ),
-          ),
-        ),
-        Positioned(
-          top: -110,
-          right: -70,
-          child: Container(
-            width: 300,
-            height: 300,
-            decoration:
-                BoxDecoration(shape: BoxShape.circle, color: wOp(.09)),
-          ),
-        ),
-        Positioned(
-          top: 40,
-          left: -120,
-          child: Container(
-            width: 250,
-            height: 250,
-            decoration:
-                BoxDecoration(shape: BoxShape.circle, color: wOp(.06)),
-          ),
-        ),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: const [Color(0x00F6F7F9), Color(0x00F6F7F9), kBody],
-              stops: [0, solid.clamp(0.0, 1.0).toDouble(), 1],
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
@@ -200,59 +130,58 @@ class EwashoHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pill = BoxDecoration(
-      color: wOp(.16),
-      borderRadius: BorderRadius.circular(22),
-      border: Border.all(color: wOp(.40)),
-    );
     return SizedBox(
-      height: 48,
+      height: 46,
       child: Row(
         children: [
-          const SizedBox(width: 4),
           const EwashoLogo(),
           const Spacer(),
           PopupMenuButton<String>(
             onSelected: onOutletChanged,
             position: PopupMenuPosition.under,
+            color: Colors.white,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(10),
             ),
             itemBuilder: (_) => [
               for (final o in outlets) PopupMenuItem(value: o, child: Text(o)),
             ],
             child: Container(
-              height: 40,
+              height: 34,
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: pill,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(17),
+                border: Border.all(color: kSlate, width: 1),
+              ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.storefront_rounded,
-                      color: Colors.white, size: 19),
-                  const SizedBox(width: 7),
+                  const Icon(Icons.storefront_outlined,
+                      color: kSlate, size: 17),
+                  const SizedBox(width: 6),
                   ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 92),
+                    constraints: const BoxConstraints(maxWidth: 96),
                     child: Text(outlet,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: ts(12, w: FontWeight.w500, c: Colors.white)),
+                        style: ts(12, w: FontWeight.w500, c: kSlate)),
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 4),
                   const Icon(Icons.keyboard_arrow_down_rounded,
-                      color: Colors.white, size: 19),
+                      color: kSlate, size: 18),
                 ],
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 6),
           GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: onAction,
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: pill,
-              child: Icon(actionIcon, color: Colors.white, size: 20),
+            child: SizedBox(
+              width: 38,
+              height: 38,
+              child: Icon(actionIcon, color: kSlate, size: 25),
             ),
           ),
         ],
@@ -272,8 +201,10 @@ class EwashoLogo extends StatelessWidget {
       children: [
         Image.asset(
           'assets/images/logo_ewasho.png',
-          width: 46,
-          height: 46,
+          width: 42,
+          height: 42,
+          color: kRed,
+          colorBlendMode: BlendMode.srcIn,
           filterQuality: FilterQuality.medium,
         ),
         const SizedBox(width: 6),
@@ -282,11 +213,11 @@ class EwashoLogo extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text('EWASHO',
-                style: ts(20, w: FontWeight.w800, c: Colors.white, h: 1.05)
+                style: ts(19, w: FontWeight.w800, c: kRed, h: 1.05)
                     .copyWith(letterSpacing: .8)),
             Text('KASIR LAUNDRY',
-                style: ts(6.8, w: FontWeight.w500, c: Colors.white)
-                    .copyWith(letterSpacing: 2.9)),
+                style: ts(7, w: FontWeight.w500, c: kSlate)
+                    .copyWith(letterSpacing: 2.6)),
           ],
         ),
       ],
@@ -294,7 +225,7 @@ class EwashoLogo extends StatelessWidget {
   }
 }
 
-/// Judul layar besar di bawah header (mis. LAPORAN, PENGATURAN).
+/// Judul layar (mis. Laporan, Pengaturan) dengan teks merah.
 class PageTitle extends StatelessWidget {
   const PageTitle(this.title, {super.key, this.subtitle});
   final String title;
@@ -302,25 +233,21 @@ class PageTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title,
-              style: ts(24, w: FontWeight.w800, c: Colors.white, h: 1.1)),
-          if (subtitle != null) ...[
-            const SizedBox(height: 4),
-            Text(subtitle!, style: ts(12, c: wOp(.95))),
-          ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: ts(21, w: FontWeight.w600, c: kRed, h: 1.15)),
+        if (subtitle != null) ...[
+          const SizedBox(height: 3),
+          Text(subtitle!, style: ts(12.5, c: kMuted)),
         ],
-      ),
+      ],
     );
   }
 }
 
 // ---------------------------------------------------------------------------
-// Kartu putih & kartu statistik
+// Kartu putih datar & kartu statistik
 // ---------------------------------------------------------------------------
 
 class EwashoCard extends StatelessWidget {
@@ -328,28 +255,22 @@ class EwashoCard extends StatelessWidget {
     super.key,
     required this.child,
     this.padding = const EdgeInsets.all(14),
-    this.radius = 20,
+    this.radius = 12,
+    this.color = Colors.white,
   });
 
   final Widget child;
   final EdgeInsetsGeometry padding;
   final double radius;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: color,
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: const Color(0xFFEDEEF1)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x141D2433),
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
       ),
       child: child,
     );
@@ -376,83 +297,52 @@ class StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return EwashoCard(
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
-      child: Stack(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFF0F1),
-                  borderRadius: BorderRadius.circular(13),
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: kTile,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: kRed, size: 22),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: ts(11.5, c: kMuted, h: 1.2)),
+                const SizedBox(height: 2),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(value, style: ts(17, w: FontWeight.w700, h: 1.25)),
                 ),
-                child: Icon(icon, color: kRed, size: 24),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                const SizedBox(height: 3),
+                Row(
                   children: [
-                    Text(label, style: ts(11.5, h: 1.2)),
-                    const SizedBox(height: 1),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child:
-                          Text(value, style: ts(17, w: FontWeight.w700, h: 1.3)),
+                    const Icon(Icons.north_east_rounded,
+                        color: kTeal, size: 13),
+                    const SizedBox(width: 3),
+                    Text(percent,
+                        style: ts(11.5, w: FontWeight.w600, c: kTeal)),
+                    const SizedBox(width: 5),
+                    Flexible(
+                      child: Text(caption,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: ts(10, c: kMuted)),
                     ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        const Icon(Icons.north_east_rounded,
-                            color: kGreen, size: 13),
-                        const SizedBox(width: 4),
-                        Text(percent,
-                            style: ts(11.5, w: FontWeight.w600, c: kGreen)),
-                      ],
-                    ),
-                    Text(caption, style: ts(9.5, c: kMuted)),
                   ],
                 ),
-              ),
-            ],
-          ),
-          const Positioned(right: 0, bottom: 2, child: MiniBars()),
-        ],
-      ),
-    );
-  }
-}
-
-class MiniBars extends StatelessWidget {
-  const MiniBars({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    const heights = [8.0, 13.0, 18.0, 24.0];
-    const colors = [
-      Color(0xFFFFB3B6),
-      Color(0xFFFF9499),
-      Color(0xFFFF7078),
-      Color(0xFFF2434B),
-    ];
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (var i = 0; i < heights.length; i++)
-          Container(
-            width: 5.5,
-            height: heights[i],
-            margin: const EdgeInsets.only(left: 2),
-            decoration: BoxDecoration(
-              color: colors[i],
-              borderRadius: BorderRadius.circular(2.5),
+              ],
             ),
           ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -8,7 +8,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light,
+    statusBarIconBrightness: Brightness.dark,
   ));
   runApp(const EwashoApp());
 }
@@ -23,8 +23,9 @@ class EwashoApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFE8212B)),
-        textTheme: GoogleFonts.poppinsTextTheme(),
+        scaffoldBackgroundColor: const Color(0xFFF4F8FB),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFE1251A)),
+        textTheme: GoogleFonts.barlowTextTheme(),
       ),
       home: const BerandaScreen(),
     );
