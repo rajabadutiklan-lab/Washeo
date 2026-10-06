@@ -5,18 +5,15 @@ import '../screens/laporan_screen.dart';
 import '../screens/pengaturan_screen.dart';
 import 'common.dart';
 
-// Indeks tab: 0 Beranda, 1 Pesanan, 2 Laporan, 3 Pengaturan, 4 Profil.
-// Nilai -1 = tombol Scan (bukan tab, sejajar dengan menu lain).
+// Indeks tab: 0 Beranda, 1 Pesanan, 2 Laporan, 3 Pengaturan.
 const _slots = [
   (0, Icons.home_outlined, 'Beranda'),
   (1, Icons.receipt_long_outlined, 'Pesanan'),
-  (-1, Icons.qr_code_scanner_rounded, 'Scan'),
   (2, Icons.bar_chart_rounded, 'Laporan'),
   (3, Icons.settings_outlined, 'Pengaturan'),
-  (4, Icons.person_outline_rounded, 'Profil'),
 ];
 
-/// Pindah tab. Indeks: 0 Beranda, 1 Pesanan, 2 Laporan, 3 Pengaturan, 4 Profil.
+/// Pindah tab. Indeks: 0 Beranda, 1 Pesanan, 2 Laporan, 3 Pengaturan.
 void goTab(BuildContext context, int from, int to) {
   if (to == from) return;
   final Widget? page = switch (to) {
@@ -26,8 +23,8 @@ void goTab(BuildContext context, int from, int to) {
     _ => null,
   };
   if (page == null) {
-    // TODO: layar Pesanan dan Profil belum dibuat.
-    showInfo(context, to == 1 ? 'Buka Pesanan' : 'Buka Profil');
+    // TODO: layar Pesanan belum dibuat.
+    showInfo(context, 'Buka Pesanan');
     return;
   }
   Navigator.of(context).pushAndRemoveUntil(
@@ -40,11 +37,15 @@ void goTab(BuildContext context, int from, int to) {
   );
 }
 
-/// Menu bawah datar yang dipakai semua layar utama.
+/// Menu bawah: 4 menu + tombol scan bulat merah di tengah.
 class EwashoBottomNav extends StatelessWidget {
   const EwashoBottomNav({super.key, required this.current});
 
   final int current;
+
+  static const double _bar = 62;
+  static const double _circle = 58;
+  static const double _rise = 14;
 
   Widget _item(BuildContext context, (int, IconData, String) slot) {
     final active = slot.$1 == current;
@@ -52,18 +53,11 @@ class EwashoBottomNav extends StatelessWidget {
     return Expanded(
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () {
-          if (slot.$1 < 0) {
-            // TODO: buka layar scan.
-            showInfo(context, 'Buka Scan Pesanan');
-          } else {
-            goTab(context, current, slot.$1);
-          }
-        },
+        onTap: () => goTab(context, current, slot.$1),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(slot.$2, color: color, size: 26),
+            Icon(slot.$2, color: color, size: 27),
             const SizedBox(height: 3),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -74,7 +68,7 @@ class EwashoBottomNav extends StatelessWidget {
                   maxLines: 1,
                   style: TextStyle(
                     color: color,
-                    fontSize: 12,
+                    fontSize: 12.5,
                     fontWeight: active ? FontWeight.w700 : FontWeight.w400,
                   ),
                 ),
@@ -92,15 +86,62 @@ class EwashoBottomNav extends StatelessWidget {
     final inset = mq.padding.bottom;
     return MediaQuery(
       data: mq.copyWith(textScaler: TextScaler.noScaling),
-      child: Container(
-        height: 64 + inset,
-        padding: EdgeInsets.only(left: 4, right: 4, bottom: inset),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: kLine)),
-        ),
-        child: Row(
-          children: [for (final s in _slots) _item(context, s)],
+      child: SizedBox(
+        height: _bar + _rise + inset,
+        child: Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: _bar + inset,
+              child: Container(
+                color: Colors.white,
+                padding: EdgeInsets.only(bottom: inset),
+                child: Row(
+                  children: [
+                    _item(context, _slots[0]),
+                    _item(context, _slots[1]),
+                    const SizedBox(width: _circle + 14),
+                    _item(context, _slots[2]),
+                    _item(context, _slots[3]),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              top: 0,
+              child: GestureDetector(
+                // TODO: buka layar scan.
+                onTap: () => showInfo(context, 'Buka Scan Pesanan'),
+                child: Container(
+                  width: _circle,
+                  height: _circle,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: kRed,
+                  ),
+                  child: const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.qr_code_scanner_rounded,
+                          color: Colors.white, size: 25),
+                      Text(
+                        'Scan',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11.5,
+                          height: 1.1,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -36,76 +36,185 @@ class _BerandaScreenState extends State<BerandaScreen> {
             onAction: () => _open('Notifikasi'),
           ),
           const SizedBox(height: 14),
+          _OmsetCard(
+            omset: 1250000,
+            onPesananBaru: () => _open('Pesanan Baru'),
+            aksi: [
+              _Aksi(Icons.receipt_long_outlined, 'Pesanan', kTeal,
+                  () => _open('Pesanan')),
+              _Aksi(Icons.qr_code_scanner_rounded, 'Scan', kOrange,
+                  () => _open('Scan Pesanan')),
+              _Aksi(Icons.bar_chart_rounded, 'Laporan', kTeal,
+                  () => _open('Laporan')),
+              _Aksi(Icons.settings_outlined, 'Pengaturan', kOrange,
+                  () => _open('Pengaturan')),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _BannerCarousel(onTap: _open),
+          const SizedBox(height: 14),
           Row(
             children: [
               Expanded(
                 child: StatCard(
-                  icon: Icons.account_balance_wallet_outlined,
-                  label: 'Omset Hari Ini',
-                  value: rupiah(1250000),
-                  percent: '+12%',
-                  caption: 'dari kemarin',
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: StatCard(
-                  icon: Icons.bar_chart_rounded,
+                  icon: Icons.calendar_month_outlined,
                   label: 'Omset Bulanan',
                   value: rupiah(28750000),
                   percent: '+8%',
                   caption: 'dari bulan lalu',
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          _BannerCarousel(onTap: _open),
-          const SizedBox(height: 18),
-          Text('Menu Utama', style: ts(15, w: FontWeight.w600)),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: _MenuCard(
-                  icon: Icons.assignment_outlined,
-                  title: 'Pesanan',
-                  subtitle: 'Kelola transaksi',
-                  onTap: () => _open('Pesanan'),
-                ),
-              ),
               const SizedBox(width: 8),
-              Expanded(
-                child: _MenuCard(
-                  icon: Icons.bar_chart_rounded,
-                  title: 'Laporan',
-                  subtitle: 'Omset & statistik',
-                  onTap: () => _open('Laporan'),
+              const Expanded(
+                child: StatCard(
+                  icon: Icons.receipt_long_outlined,
+                  label: 'Pesanan Hari Ini',
+                  value: '48',
+                  percent: '+18%',
+                  caption: 'dari kemarin',
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: _MenuCard(
-                  icon: Icons.qr_code_scanner_rounded,
-                  title: 'Scan Pesanan',
-                  subtitle: 'Cek status & ambil',
-                  onTap: () => _open('Scan Pesanan'),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Kartu omset gelap + baris aksi cepat
+// ---------------------------------------------------------------------------
+
+class _Aksi {
+  const _Aksi(this.icon, this.label, this.color, this.onTap);
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+}
+
+class _OmsetCard extends StatefulWidget {
+  const _OmsetCard({
+    required this.omset,
+    required this.onPesananBaru,
+    required this.aksi,
+  });
+
+  final int omset;
+  final VoidCallback onPesananBaru;
+  final List<_Aksi> aksi;
+
+  @override
+  State<_OmsetCard> createState() => _OmsetCardState();
+}
+
+class _OmsetCardState extends State<_OmsetCard> {
+  bool _tampil = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            color: kDark,
+            padding: const EdgeInsets.fromLTRB(18, 18, 16, 18),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Omset Hari Ini',
+                          style: ts(13, c: Colors.white, h: 1.2)),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                _tampil ? rupiah(widget.omset) : 'Rp ••••••',
+                                style: ts(25,
+                                    w: FontWeight.w600,
+                                    c: Colors.white,
+                                    h: 1.15),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () => setState(() => _tampil = !_tampil),
+                            child: Icon(
+                              _tampil
+                                  ? Icons.visibility_rounded
+                                  : Icons.visibility_off_rounded,
+                              color: Colors.white,
+                              size: 22,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _MenuCard(
-                  icon: Icons.settings_outlined,
-                  title: 'Pengaturan',
-                  subtitle: 'Outlet, layanan, dll',
-                  onTap: () => _open('Pengaturan'),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: widget.onPesananBaru,
+                  child: Container(
+                    height: 34,
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(17),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.add_rounded,
+                            color: Color(0xFF363636), size: 17),
+                        const SizedBox(width: 6),
+                        Text('Pesanan Baru',
+                            style: ts(12,
+                                w: FontWeight.w600,
+                                c: const Color(0xFF363636))),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
+          ),
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Row(
+              children: [
+                for (final a in widget.aksi)
+                  Expanded(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: a.onTap,
+                      child: Column(
+                        children: [
+                          Icon(a.icon, color: a.color, size: 30),
+                          const SizedBox(height: 6),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(a.label,
+                                style: ts(12.5, c: kSlate, h: 1.2)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ],
       ),
@@ -256,77 +365,6 @@ class _BannerSlide extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Kartu menu 2x2
-// ---------------------------------------------------------------------------
-
-class _MenuCard extends StatelessWidget {
-  const _MenuCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: SizedBox(
-        height: 112,
-        child: EwashoCard(
-          padding: const EdgeInsets.fromLTRB(12, 12, 10, 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: kTile,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(icon, size: 25, color: kRed),
-                  ),
-                  const Spacer(),
-                  Container(
-                    width: 24,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE5E5E5),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Icon(Icons.chevron_right_rounded,
-                        size: 18, color: kRed),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: Text(title, style: ts(14, w: FontWeight.w600, h: 1.25)),
-              ),
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: Text(subtitle, style: ts(11, c: kMuted, h: 1.3)),
-              ),
-            ],
-          ),
         ),
       ),
     );
