@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../widgets/bottom_nav.dart';
+
 // Layar Laporan. Sengaja TANPA BackdropFilter / blur supaya ringan:
 // semua kartu berwarna solid, grafik digambar langsung dengan CustomPainter.
 
@@ -135,16 +137,7 @@ class _LaporanScreenState extends State<LaporanScreen> {
     return Scaffold(
       extendBody: true,
       backgroundColor: const Color(0xFFFDEEEF),
-      bottomNavigationBar: _LaporanNav(
-        onTap: (i) {
-          if (i == 0) {
-            Navigator.of(context).maybePop();
-          } else if (i != 2) {
-            _info('Buka ${_LaporanNav.items[i].$2}');
-          }
-        },
-        onScan: () => _info('Buka Scan Pesanan'),
-      ),
+      bottomNavigationBar: const EwashoBottomNav(current: 2),
       body: Stack(
         children: [
           const Positioned.fill(child: RepaintBoundary(child: _Background())),
@@ -1253,132 +1246,6 @@ class _Chips extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [_line(0, 1), const SizedBox(height: 4), _line(2, 3)],
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Navigasi bawah (Laporan aktif)
-// ---------------------------------------------------------------------------
-
-class _LaporanNav extends StatelessWidget {
-  const _LaporanNav({required this.onTap, required this.onScan});
-  final ValueChanged<int> onTap;
-  final VoidCallback onScan;
-
-  static const items = [
-    (Icons.home_outlined, 'Beranda'),
-    (Icons.receipt_long_outlined, 'Pesanan'),
-    (Icons.bar_chart_rounded, 'Laporan'),
-    (Icons.settings_outlined, 'Pengaturan'),
-    (Icons.person_outline_rounded, 'Profil'),
-  ];
-
-  Widget _item(int i) {
-    final active = i == 2;
-    final color = active ? _red : _muted;
-    return Expanded(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () => onTap(i),
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 7),
-            decoration: BoxDecoration(
-              color: active ? const Color(0xFFFFE4E6) : null,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(items[i].$1, color: color, size: 24),
-                const SizedBox(height: 2),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    items[i].$2,
-                    maxLines: 1,
-                    style: TextStyle(
-                      color: color,
-                      fontSize: 10,
-                      fontWeight: active ? FontWeight.w600 : FontWeight.w400,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final mq = MediaQuery.of(context);
-    final inset = mq.padding.bottom;
-    return MediaQuery(
-      data: mq.copyWith(textScaler: TextScaler.noScaling),
-      child: SizedBox(
-        height: 106 + inset,
-        child: Stack(
-          alignment: Alignment.bottomCenter,
-          children: [
-            Container(
-              height: 76 + inset,
-              padding: EdgeInsets.only(left: 4, right: 4, bottom: inset),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0x1A800010),
-                    blurRadius: 14,
-                    offset: Offset(0, -4),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Expanded(child: Row(children: [_item(0), _item(1)])),
-                  const SizedBox(width: 78),
-                  Expanded(
-                    child: Row(children: [_item(2), _item(3), _item(4)]),
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              top: 0,
-              child: GestureDetector(
-                onTap: onScan,
-                child: Container(
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 4),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [Color(0xFFFF5A60), Color(0xFFD0131F)],
-                    ),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x40C40F1B),
-                        blurRadius: 12,
-                        offset: Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(Icons.qr_code_scanner_rounded,
-                      color: Colors.white, size: 32),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

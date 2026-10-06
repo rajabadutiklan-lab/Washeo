@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import 'laporan_screen.dart';
+import '../widgets/bottom_nav.dart';
 
 // ---------------------------------------------------------------------------
 // Warna & helper
@@ -41,20 +41,13 @@ class BerandaScreen extends StatefulWidget {
 }
 
 class _BerandaScreenState extends State<BerandaScreen> {
-  final int _navIndex = 0;
   String _outlet = 'Outlet Utama';
   final _outlets = const ['Outlet Utama', 'Outlet Cabang 1', 'Outlet Cabang 2'];
 
   // TODO: ganti dengan navigasi ke layar masing-masing.
   void _open(String name) {
-    if (name == 'Laporan') {
-      Navigator.of(context).push(PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const LaporanScreen(),
-        transitionDuration: Duration.zero,
-        reverseTransitionDuration: Duration.zero,
-      ));
-      return;
-    }
+    if (name == 'Laporan') return goTab(context, 0, 2);
+    if (name == 'Pengaturan') return goTab(context, 0, 3);
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(
@@ -69,13 +62,7 @@ class _BerandaScreenState extends State<BerandaScreen> {
     return Scaffold(
       extendBody: true,
       backgroundColor: EColors.red,
-      bottomNavigationBar: _BottomNav(
-        index: _navIndex,
-        onTap: (i) {
-          if (i != 0) _open(const ['Beranda', 'Pesanan', 'Laporan', 'Profil'][i]);
-        },
-        onScan: () => _open('Scan Pesanan'),
-      ),
+      bottomNavigationBar: const EwashoBottomNav(current: 0),
       body: Stack(
         children: [
           const Positioned.fill(child: _Background()),
@@ -823,130 +810,6 @@ class _MenuCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Navigasi bawah dengan tombol scan di tengah
-// ---------------------------------------------------------------------------
-
-class _BottomNav extends StatelessWidget {
-  const _BottomNav({
-    required this.index,
-    required this.onTap,
-    required this.onScan,
-  });
-
-  final int index;
-  final ValueChanged<int> onTap;
-  final VoidCallback onScan;
-
-  static const _items = [
-    (Icons.home_rounded, 'Beranda'),
-    (Icons.receipt_long_outlined, 'Pesanan'),
-    (Icons.bar_chart_rounded, 'Laporan'),
-    (Icons.person_outline_rounded, 'Profil'),
-  ];
-
-  Widget _item(int i) {
-    final active = i == index;
-    final color = active ? EColors.red : EColors.muted;
-    return Expanded(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () => onTap(i),
-        child: Center(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-            decoration: BoxDecoration(
-              color: active ? const Color(0xFFFFE4E6) : Colors.transparent,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(_items[i].$1, color: color, size: 26),
-                const SizedBox(height: 2),
-                Text(
-                  _items[i].$2,
-                  style: TextStyle(
-                    color: color,
-                    fontSize: 11,
-                    fontWeight: active ? FontWeight.w600 : FontWeight.w400,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final inset = MediaQuery.of(context).padding.bottom;
-    return SizedBox(
-      height: 108 + inset,
-      child: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          Container(
-            height: 78 + inset,
-            padding: EdgeInsets.only(left: 6, right: 6, bottom: inset),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0x33800010),
-                  blurRadius: 24,
-                  offset: Offset(0, -6),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                _item(0),
-                _item(1),
-                const SizedBox(width: 84),
-                _item(2),
-                _item(3),
-              ],
-            ),
-          ),
-          Positioned(
-            top: 0,
-            child: GestureDetector(
-              onTap: onScan,
-              child: Container(
-                width: 76,
-                height: 76,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 4),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [EColors.redLight, EColors.redDark],
-                  ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x66C40F1B),
-                      blurRadius: 18,
-                      offset: Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: const Icon(Icons.qr_code_scanner_rounded,
-                    color: Colors.white, size: 34),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -29,6 +29,7 @@ jobs:
           flutter create . --platforms=android --org com.ewasho --project-name ewasho
           rm -f test/widget_test.dart
           cp -r branding/android/res/. android/app/src/main/res/
+          sed -i 's/android:label="ewasho"/android:label="EWASHO"/' android/app/src/main/AndroidManifest.xml
 
       - run: flutter pub get
 
