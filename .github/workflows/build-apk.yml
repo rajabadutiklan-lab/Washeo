@@ -43,13 +43,13 @@ jobs:
       - name: Build APK
         run: |
           set -o pipefail
-          flutter build apk --release 2>&1 | tee build.log || {
+          flutter build apk --release --split-per-abi 2>&1 | tee build.log || {
             grep -iE 'error|FAILURE|What went wrong' -A2 build.log | head -40 | while read -r l; do echo "::error::$l"; done
             exit 1
           }
 
       - name: Ganti nama APK
-        run: mv build/app/outputs/flutter-apk/app-release.apk ewasho-preview.apk
+        run: mv build/app/outputs/flutter-apk/app-arm64-v8a-release.apk ewasho-preview.apk
 
       - uses: actions/upload-artifact@v4
         with:
