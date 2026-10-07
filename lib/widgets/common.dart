@@ -360,3 +360,58 @@ class StatCard extends StatelessWidget {
     );
   }
 }
+
+// ---------------------------------------------------------------------------
+// Avatar pelanggan
+// ---------------------------------------------------------------------------
+
+/// Foto avatar pelanggan. Wajah dipilih "acak" dari 10 gambar per jenis
+/// kelamin, tetapi selalu sama untuk [seed] yang sama (mis. nama atau nomor
+/// HP pelanggan), jadi tidak berganti-ganti tiap layar dibuka.
+///
+/// Gambarnya kecil (112 px, sekitar 2 KB per file) dan di-decode pada ukuran
+/// kecil, jadi aman dipakai di daftar panjang.
+class CustomerAvatar extends StatelessWidget {
+  const CustomerAvatar({
+    super.key,
+    required this.seed,
+    required this.pria,
+    this.size = 46,
+  });
+
+  final String seed;
+  final bool pria;
+  final double size;
+
+  static const int jumlahPerJenis = 10;
+
+  static String assetFor(String seed, {required bool pria}) {
+    var h = 7;
+    for (final c in seed.codeUnits) {
+      h = (h * 31 + c) & 0x7fffffff;
+    }
+    final n = (h % jumlahPerJenis) + 1;
+    final nama = pria ? 'pria' : 'wanita';
+    return 'assets/images/avatars/${nama}_${n.toString().padLeft(2, '0')}.webp';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipOval(
+      child: Image.asset(
+        assetFor(seed, pria: pria),
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+        cacheWidth: 112,
+        filterQuality: FilterQuality.medium,
+        errorBuilder: (_, __, ___) => Container(
+          width: size,
+          height: size,
+          color: kTile,
+          child: Icon(Icons.person_rounded, color: kOutline, size: size * .6),
+        ),
+      ),
+    );
+  }
+}

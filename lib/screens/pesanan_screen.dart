@@ -17,9 +17,10 @@ const _statuses = [
 ];
 
 class _Order {
-  const _Order(this.nama, this.kode, this.masuk, this.layanan, this.berat,
-      this.total, this.status);
+  const _Order(this.nama, this.pria, this.kode, this.masuk, this.layanan,
+      this.berat, this.total, this.status);
   final String nama;
+  final bool pria;
   final String kode;
   final String masuk;
   final int layanan;
@@ -30,17 +31,17 @@ class _Order {
 
 // Data contoh (ganti dengan data asli).
 const _orders = [
-  _Order('Agus Pratama', 'EW-261004-0134', '4 Okt 2026, 10:05', 2, 3.2, 27000,
+  _Order('Agus Pratama', true, 'EW-261004-0134', '4 Okt 2026, 10:05', 2, 3.2, 27000,
       'Antrian'),
-  _Order('Siti Nurhaliza', 'EW-261004-0133', '4 Okt 2026, 09:21', 3, 2.5,
+  _Order('Siti Nurhaliza', false, 'EW-261004-0133', '4 Okt 2026, 09:21', 3, 2.5,
       35000, 'Proses'),
-  _Order('Budi Santoso', 'EW-261004-0132', '4 Okt 2026, 08:45', 2, 4.0, 24000,
+  _Order('Budi Santoso', true, 'EW-261004-0132', '4 Okt 2026, 08:45', 2, 4.0, 24000,
       'Antrian'),
-  _Order('Rina Aprilia', 'EW-261004-0131', '3 Okt 2026, 16:20', 4, 3.0, 48000,
+  _Order('Rina Aprilia', false, 'EW-261004-0131', '3 Okt 2026, 16:20', 4, 3.0, 48000,
       'Siap Ambil'),
-  _Order('Andi Wijaya', 'EW-261004-0130', '3 Okt 2026, 14:10', 1, 1.0, 12000,
+  _Order('Andi Wijaya', true, 'EW-261004-0130', '3 Okt 2026, 14:10', 1, 1.0, 12000,
       'Diambil'),
-  _Order('Dewi Lestari', 'EW-261004-0129', '3 Okt 2026, 11:35', 3, 2.8, 32000,
+  _Order('Dewi Lestari', false, 'EW-261004-0129', '3 Okt 2026, 11:35', 3, 2.8, 32000,
       'Proses'),
 ];
 
@@ -313,13 +314,6 @@ class _OrderCard extends StatelessWidget {
   final _Order order;
   final VoidCallback onTap;
 
-  String get _initials {
-    final parts = order.nama.split(' ');
-    final a = parts.first.isEmpty ? '' : parts.first[0];
-    final b = parts.length > 1 && parts.last.isNotEmpty ? parts.last[0] : '';
-    return (a + b).toUpperCase();
-  }
-
   @override
   Widget build(BuildContext context) {
     final (bg, fg, icon) = _statusStyle(order.status);
@@ -336,18 +330,7 @@ class _OrderCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 46,
-              height: 46,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: wOp(.9),
-                border: Border.all(color: const Color(0xFFDDE2EA)),
-              ),
-              child:
-                  Text(_initials, style: ts(14, w: FontWeight.w600, c: kSlate)),
-            ),
+            CustomerAvatar(seed: order.nama, pria: order.pria),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
