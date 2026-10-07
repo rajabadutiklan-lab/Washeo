@@ -165,12 +165,11 @@ class _OmsetCardState extends State<_OmsetCard> {
                                     width: 56,
                                     height: 56,
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(color: kLine),
+                                      shape: BoxShape.circle,
+                                      color: a.color,
                                     ),
                                     child: Icon(a.icon,
-                                        color: a.color, size: 28),
+                                        color: Colors.white, size: 28),
                                   ),
                                   const SizedBox(height: 8),
                                   SizedBox(
