@@ -254,6 +254,8 @@ class _OrderSheet extends StatelessWidget {
                 _baris('${i.nama}  (${fmtQty(i.qty)} ${i.satuan})',
                     rupiah(i.subtotal)),
               const Divider(height: 16, color: kLine),
+              if (o.diskon > 0)
+                _baris('Diskon ${o.diskon}%', '- ${rupiah(o.potongan)}'),
               _baris('Total', rupiah(o.total), tebal: true),
               _baris(
                   'Pembayaran',
@@ -261,6 +263,9 @@ class _OrderSheet extends StatelessWidget {
                       ? o.bayar
                       : '${o.bayar} • ${o.metode}'),
               if (o.bayar == 'DP') _baris('Sisa', rupiah(o.sisa)),
+              _baris('Penyerahan', o.penyerahan),
+              if (o.parfum.isNotEmpty) _baris('Parfum', o.parfum),
+              if (o.prioritas) _baris('Prioritas', 'Ya'),
               _baris('Masuk', fmtWaktu(o.masuk)),
               _baris('Perkiraan selesai', fmtWaktu(o.estimasi)),
               if (o.catatan.isNotEmpty) _baris('Catatan', o.catatan),
@@ -465,7 +470,9 @@ class _OrderCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 2),
-                  Text('${order.kode}  •  ${order.durasi}',
+                  Text(
+                      '${order.kode}  •  ${order.durasi}'
+                      '${order.prioritas ? '  •  Prioritas' : ''}',
                       style: ts(11.5, c: kMuted, h: 1.3)),
                   Text('Masuk: ${fmtWaktu(order.masuk)}',
                       style: ts(11.5, c: kMuted, h: 1.3)),

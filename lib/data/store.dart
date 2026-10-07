@@ -35,9 +35,9 @@ class Durasi {
 
 // Angka contoh - sesuaikan dengan aturan usaha.
 const kDurasi = [
-  Durasi('Reguler', 72, 1.0, '3 hari'),
-  Durasi('Express', 24, 1.5, '1 hari'),
-  Durasi('Kilat', 6, 2.0, '6 jam'),
+  Durasi('Reguler', 72, 1.0, '72 Jam'),
+  Durasi('Express', 24, 1.5, '24 Jam'),
+  Durasi('Kilat', 6, 2.0, '6 Jam'),
 ];
 
 class Service {
@@ -150,6 +150,10 @@ class Order {
     this.metode = '',
     this.dibayar = 0,
     this.catatan = '',
+    this.parfum = '',
+    this.penyerahan = 'Datang Langsung',
+    this.prioritas = false,
+    this.diskon = 0,
   });
 
   final String kode;
@@ -168,7 +172,19 @@ class Order {
   int dibayar;
   String catatan;
 
-  int get total => items.fold(0, (a, b) => a + b.subtotal);
+  /// Nama parfum, kosong = tanpa parfum.
+  final String parfum;
+
+  /// Datang Langsung, Antar ke Pelanggan, atau Jemput & Antar.
+  final String penyerahan;
+  final bool prioritas;
+
+  /// Diskon dalam persen (0, 10, 20).
+  final int diskon;
+
+  int get subtotal => items.fold(0, (a, b) => a + b.subtotal);
+  int get potongan => (subtotal * diskon / 100).round();
+  int get total => subtotal - potongan;
   int get sisa => (total - dibayar).clamp(0, total).toInt();
   double get beratKg =>
       items.where((i) => i.satuan == 'kg').fold(0.0, (a, b) => a + b.qty);
@@ -187,6 +203,10 @@ class Order {
         'metode': metode,
         'dibayar': dibayar,
         'catatan': catatan,
+        'parfum': parfum,
+        'penyerahan': penyerahan,
+        'prioritas': prioritas,
+        'diskon': diskon,
       };
 
   factory Order.fromJson(Map<String, dynamic> j) => Order(
@@ -206,6 +226,10 @@ class Order {
         metode: (j['metode'] ?? '') as String,
         dibayar: ((j['dibayar'] ?? 0) as num).toInt(),
         catatan: (j['catatan'] ?? '') as String,
+        parfum: (j['parfum'] ?? '') as String,
+        penyerahan: (j['penyerahan'] ?? 'Datang Langsung') as String,
+        prioritas: (j['prioritas'] ?? false) as bool,
+        diskon: ((j['diskon'] ?? 0) as num).toInt(),
       );
 }
 
@@ -313,6 +337,10 @@ class AppStore extends ChangeNotifier {
     String metode = '',
     int dibayar = 0,
     String catatan = '',
+    String parfum = '',
+    String penyerahan = 'Datang Langsung',
+    bool prioritas = false,
+    int diskon = 0,
   }) {
     final now = DateTime.now();
     final o = Order(
@@ -329,6 +357,10 @@ class AppStore extends ChangeNotifier {
       metode: metode,
       dibayar: dibayar,
       catatan: catatan,
+      parfum: parfum,
+      penyerahan: penyerahan,
+      prioritas: prioritas,
+      diskon: diskon,
     );
     orders.insert(0, o);
     _save();
