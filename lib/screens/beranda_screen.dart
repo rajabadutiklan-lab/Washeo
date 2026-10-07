@@ -55,6 +55,27 @@ class _BerandaScreenState extends State<BerandaScreen> {
                   () => _open('Chatbot')),
             ],
           ),
+          const SizedBox(height: 12),
+          GestureDetector(
+            onTap: () => _open('Manage Outlet'),
+            child: Container(
+              height: 50,
+              decoration: BoxDecoration(
+                color: kRed,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.apps_rounded, color: Colors.white, size: 22),
+                  const SizedBox(width: 10),
+                  Text('MANAGE OUTLET',
+                      style: ts(14, w: FontWeight.w600, c: Colors.white)
+                          .copyWith(letterSpacing: .6)),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
