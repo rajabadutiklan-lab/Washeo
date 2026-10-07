@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../screens/beranda_screen.dart';
 import '../screens/laporan_screen.dart';
 import '../screens/pengaturan_screen.dart';
+import '../screens/pesanan_screen.dart';
 import 'common.dart';
 
 // Indeks tab: 0 Beranda, 1 Pesanan, 2 Laporan, 3 Pengaturan.
@@ -18,15 +19,12 @@ void goTab(BuildContext context, int from, int to) {
   if (to == from) return;
   final Widget? page = switch (to) {
     0 => const BerandaScreen(),
+    1 => const PesananScreen(),
     2 => const LaporanScreen(),
     3 => const PengaturanScreen(),
     _ => null,
   };
-  if (page == null) {
-    // TODO: layar Pesanan belum dibuat.
-    showInfo(context, 'Buka Pesanan');
-    return;
-  }
+  if (page == null) return;
   Navigator.of(context).pushAndRemoveUntil(
     PageRouteBuilder(
       pageBuilder: (_, __, ___) => page,

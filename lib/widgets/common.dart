@@ -56,7 +56,15 @@ void showInfo(BuildContext context, String text) {
 // ---------------------------------------------------------------------------
 
 class EwashoPage extends StatelessWidget {
-  const EwashoPage({super.key, required this.current, required this.child});
+  const EwashoPage({
+    super.key,
+    required this.current,
+    required this.child,
+    this.background,
+  });
+
+  /// Latar khusus (diam, tidak ikut scroll). Kosong = warna polos.
+  final Widget? background;
 
   /// Indeks menu bawah yang aktif.
   final int current;
@@ -77,7 +85,11 @@ class EwashoPage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: kBody,
         bottomNavigationBar: EwashoBottomNav(current: current),
-        body: SafeArea(
+        body: Stack(
+          children: [
+            if (background != null)
+              Positioned.fill(child: RepaintBoundary(child: background!)),
+            SafeArea(
           bottom: false,
           child: SingleChildScrollView(
             padding: const EdgeInsets.only(bottom: 20),
@@ -102,6 +114,8 @@ class EwashoPage extends StatelessWidget {
               ),
             ),
           ),
+        ),
+          ],
         ),
       ),
     );
