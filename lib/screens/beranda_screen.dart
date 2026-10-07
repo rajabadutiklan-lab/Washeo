@@ -42,18 +42,14 @@ class _BerandaScreenState extends State<BerandaScreen> {
           _OmsetCard(
             omset: 1250000,
             aksi: [
-              _Aksi(Icons.post_add_rounded, 'Tambah\nTransaksi', kTeal,
-                  () => _open('Tambah Transaksi')),
-              _Aksi(Icons.manage_search_rounded, 'Cari\nTransaksi', kOrange,
-                  () => _open('Cari Transaksi')),
-              _Aksi(Icons.local_shipping_outlined, 'Kurir', kTeal,
-                  () => _open('Kurir')),
-              _Aksi(Icons.people_outline_rounded, 'Pelanggan', kOrange,
-                  () => _open('Pelanggan')),
-              _Aksi(Icons.today_outlined, 'Hari Ini', kTeal,
-                  () => _open('Hari Ini')),
-              _Aksi(Icons.smart_toy_outlined, 'Chatbot', kOrange,
-                  () => _open('Chatbot')),
+              _Aksi('\u{1F9FE}', 'Tambah\nTransaksi',
+                  () => _open('Tambah Transaksi'),
+                  plus: true),
+              _Aksi('\u{1F6F5}', 'Antar\nJemput', () => _open('Antar Jemput')),
+              _Aksi('\u{1F69A}', 'Kurir', () => _open('Kurir')),
+              _Aksi('\u{1F465}', 'Pelanggan', () => _open('Pelanggan')),
+              _Aksi('\u{1F4C5}', 'Hari Ini', () => _open('Hari Ini'), badge: 0),
+              _Aksi('\u{1F916}', 'Chatbot', () => _open('Chatbot')),
             ],
           ),
           const SizedBox(height: 12),
@@ -88,11 +84,16 @@ class _BerandaScreenState extends State<BerandaScreen> {
 // ---------------------------------------------------------------------------
 
 class _Aksi {
-  const _Aksi(this.icon, this.label, this.color, this.onTap);
-  final IconData icon;
+  const _Aksi(this.emoji, this.label, this.onTap, {this.badge, this.plus = false});
+  final String emoji;
   final String label;
-  final Color color;
   final VoidCallback onTap;
+
+  /// Angka di pojok kanan atas (null = tidak ditampilkan).
+  final int? badge;
+
+  /// Tanda plus merah kecil di pojok ikon.
+  final bool plus;
 }
 
 class _OmsetCard extends StatelessWidget {
@@ -108,52 +109,109 @@ class _OmsetCard extends StatelessWidget {
       children: [
         _GlassOmset(omset: omset, masuk: 6, harusSelesai: 3, terlambat: 1),
         const SizedBox(height: 10),
-        EwashoCard(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: Column(
+        for (var r = 0; r < aksi.length; r += 3) ...[
+          if (r > 0) const SizedBox(height: 8),
+          Row(
             children: [
-              for (var r = 0; r < aksi.length; r += 3)
-                Row(
-                  children: [
-                    for (final a in aksi.skip(r).take(3))
-                      Expanded(
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: a.onTap,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 4),
-                            child: Column(
-                              children: [
-                                Container(
-                                  width: 56,
-                                  height: 56,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: a.color,
-                                  ),
-                                  child: Icon(a.icon,
-                                      color: Colors.white, size: 28),
-                                ),
-                                const SizedBox(height: 8),
-                                SizedBox(
-                                  height: 34,
-                                  child: Text(a.label,
-                                      textAlign: TextAlign.center,
-                                      maxLines: 2,
-                                      style: ts(12, c: kSlate, h: 1.25)),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+              for (var c = r; c < r + 3 && c < aksi.length; c++) ...[
+                if (c > r) const SizedBox(width: 8),
+                Expanded(child: _GlassTile(aksi[c])),
+              ],
             ],
           ),
-        ),
+        ],
       ],
+    );
+  }
+}
+
+/// Ubin menu tembus pandang (kaca tipis tanpa blur).
+class _GlassTile extends StatelessWidget {
+  const _GlassTile(this.data);
+  final _Aksi data;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: data.onTap,
+      child: Container(
+        height: 108,
+        decoration: BoxDecoration(
+          color: wOp(.62),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white, width: 1.4),
+        ),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(4, 12, 4, 8),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: 46,
+                      height: 42,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.center,
+                        children: [
+                          Text(data.emoji,
+                              style: const TextStyle(fontSize: 32, height: 1.2)),
+                          if (data.plus)
+                            Positioned(
+                              right: -2,
+                              bottom: 0,
+                              child: Container(
+                                width: 18,
+                                height: 18,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: kRed,
+                                  border:
+                                      Border.all(color: Colors.white, width: 1.5),
+                                ),
+                                child: const Icon(Icons.add_rounded,
+                                    color: Colors.white, size: 13),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const Spacer(),
+                    SizedBox(
+                      height: 34,
+                      child: Center(
+                        child: Text(data.label,
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            style: ts(12.5, c: kInk, h: 1.2)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (data.badge != null)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  constraints: const BoxConstraints(minWidth: 20),
+                  height: 20,
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: kRed,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text('${data.badge}',
+                      style: ts(10.5,
+                          w: FontWeight.w600, c: Colors.white, h: 1.1)),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
