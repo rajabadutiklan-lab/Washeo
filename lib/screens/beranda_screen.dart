@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../data/store.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/common.dart';
+import 'pelanggan_screen.dart';
+import 'tambah_transaksi_screen.dart';
 
 // Layar Beranda. Datar: tanpa blur, tanpa gradient, tanpa bayangan.
 
@@ -19,6 +22,18 @@ class _BerandaScreenState extends State<BerandaScreen> {
   void _open(String name) {
     if (name == 'Laporan') return goTab(context, 0, 2);
     if (name == 'Pengaturan') return goTab(context, 0, 3);
+    if (name == 'Tambah Transaksi') {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => const TambahTransaksiScreen(),
+      ));
+      return;
+    }
+    if (name == 'Pelanggan') {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => const PelangganScreen(),
+      ));
+      return;
+    }
     showInfo(context, 'Buka $name');
   }
 
@@ -40,7 +55,6 @@ class _BerandaScreenState extends State<BerandaScreen> {
           _BannerCarousel(onTap: _open),
           const SizedBox(height: 12),
           _OmsetCard(
-            omset: 1250000,
             aksi: [
               _Aksi('tambah', 'Tambah\nTransaksi',
                   () => _open('Tambah Transaksi')),
@@ -95,9 +109,8 @@ class _Aksi {
 }
 
 class _OmsetCard extends StatelessWidget {
-  const _OmsetCard({required this.omset, required this.aksi});
+  const _OmsetCard({required this.aksi});
 
-  final int omset;
   final List<_Aksi> aksi;
 
   @override
@@ -105,7 +118,15 @@ class _OmsetCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _GlassOmset(omset: omset, masuk: 6, harusSelesai: 3, terlambat: 1),
+        ListenableBuilder(
+          listenable: AppStore.I,
+          builder: (context, _) => _GlassOmset(
+            omset: AppStore.I.omsetHariIni,
+            masuk: AppStore.I.masukHariIni,
+            harusSelesai: AppStore.I.harusSelesai,
+            terlambat: AppStore.I.terlambat,
+          ),
+        ),
         const SizedBox(height: 10),
         for (var r = 0; r < aksi.length; r += 3) ...[
           if (r > 0) const SizedBox(height: 8),

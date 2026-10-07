@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../widgets/common.dart';
+import 'pelanggan_screen.dart';
 
 class _Menu {
   const _Menu(this.judul, this.sub, this.icon, this.warna);
@@ -42,7 +43,15 @@ class _PengaturanScreenState extends State<PengaturanScreen> {
   String _outlet = 'Outlet Utama';
 
   // TODO: ganti dengan navigasi ke layar masing-masing.
-  void _open(String name) => showInfo(context, 'Buka $name');
+  void _open(String name) {
+    if (name == 'Database Pelanggan') {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => const PelangganScreen(),
+      ));
+      return;
+    }
+    showInfo(context, 'Buka $name');
+  }
 
   @override
   Widget build(BuildContext context) {

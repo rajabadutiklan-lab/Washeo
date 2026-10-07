@@ -1,49 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../data/store.dart';
 import '../widgets/common.dart';
+import 'tambah_transaksi_screen.dart';
 
 // Layar Pesanan. Kartu tembus pandang (kaca tipis TANPA blur) di atas latar
-// putih dengan variasi abu lembut, supaya efek transparannya terlihat.
-
-const _statuses = [
-  'Penjemputan',
-  'Antrian',
-  'Proses',
-  'Siap Ambil',
-  'Diantar',
-  'Diambil',
-  'Batal',
-  'Telat Ambil',
-];
-
-class _Order {
-  const _Order(this.nama, this.pria, this.kode, this.masuk, this.layanan,
-      this.berat, this.total, this.status);
-  final String nama;
-  final bool pria;
-  final String kode;
-  final String masuk;
-  final int layanan;
-  final double berat;
-  final int total;
-  final String status;
-}
-
-// Data contoh (ganti dengan data asli).
-const _orders = [
-  _Order('Agus Pratama', true, 'EW-261004-0134', '4 Okt 2026, 10:05', 2, 3.2, 27000,
-      'Antrian'),
-  _Order('Siti Nurhaliza', false, 'EW-261004-0133', '4 Okt 2026, 09:21', 3, 2.5,
-      35000, 'Proses'),
-  _Order('Budi Santoso', true, 'EW-261004-0132', '4 Okt 2026, 08:45', 2, 4.0, 24000,
-      'Antrian'),
-  _Order('Rina Aprilia', false, 'EW-261004-0131', '3 Okt 2026, 16:20', 4, 3.0, 48000,
-      'Siap Ambil'),
-  _Order('Andi Wijaya', true, 'EW-261004-0130', '3 Okt 2026, 14:10', 1, 1.0, 12000,
-      'Diambil'),
-  _Order('Dewi Lestari', false, 'EW-261004-0129', '3 Okt 2026, 11:35', 3, 2.8, 32000,
-      'Proses'),
-];
+// putih dengan variasi abu lembut. Data diambil dari AppStore.
 
 (Color, Color, IconData) _statusStyle(String s) => switch (s) {
       'Antrian' => (const Color(0xFFE9EDF2), kSlate, Icons.description_outlined),
@@ -77,93 +39,274 @@ class PesananScreen extends StatefulWidget {
 class _PesananScreenState extends State<PesananScreen> {
   String _outlet = 'Outlet Utama';
   String _tab = 'Antrian';
+  String _q = '';
+  bool _cari = false;
 
-  int _count(String status) => _orders.where((o) => o.status == status).length;
+  void _tambah() {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => const TambahTransaksiScreen(),
+    ));
+  }
+
+  void _detail(Order o) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _OrderSheet(order: o),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final list = _orders.where((o) => o.status == _tab).toList();
-    return EwashoPage(
-      current: 1,
-      background: const SoftGreyBackground(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          EwashoHeader(
-            outlet: _outlet,
-            onOutletChanged: (v) => setState(() => _outlet = v),
-            actionIcon: Icons.notifications_rounded,
-            onAction: () => showInfo(context, 'Buka Notifikasi'),
-          ),
-          const SizedBox(height: 16),
-          Row(
+    return ListenableBuilder(
+      listenable: AppStore.I,
+      builder: (context, _) {
+        final store = AppStore.I;
+        final q = _q.toLowerCase();
+        int count(String s) => store.orders.where((o) => o.status == s).length;
+        final list = store.orders.where((o) {
+          if (q.isNotEmpty) {
+            return o.nama.toLowerCase().contains(q) ||
+                o.kode.toLowerCase().contains(q);
+          }
+          return o.status == _tab;
+        }).toList();
+
+        return EwashoPage(
+          current: 1,
+          background: const SoftGreyBackground(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const PageTitle('Pesanan'),
-              const Spacer(),
-              _RoundButton(
-                icon: Icons.search_rounded,
-                filled: false,
-                onTap: () => showInfo(context, 'Cari pesanan'),
+              EwashoHeader(
+                outlet: _outlet,
+                onOutletChanged: (v) => setState(() => _outlet = v),
+                actionIcon: Icons.notifications_rounded,
+                onAction: () => showInfo(context, 'Buka Notifikasi'),
               ),
-              const SizedBox(width: 8),
-              _RoundButton(
-                icon: Icons.add_rounded,
-                filled: true,
-                onTap: () => showInfo(context, 'Tambah pesanan'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Container(
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: kLine)),
-            ),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
+              const SizedBox(height: 16),
+              Row(
                 children: [
-                  for (final s in _statuses)
-                    _Tab(
-                      label: s,
-                      count: _count(s),
-                      active: s == _tab,
-                      onTap: () => setState(() => _tab = s),
-                    ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          if (list.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 56),
-              child: Column(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: kTile,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(Icons.receipt_long_outlined,
-                        color: kMuted, size: 26),
+                  const PageTitle('Pesanan'),
+                  const Spacer(),
+                  _RoundButton(
+                    icon: _cari ? Icons.close_rounded : Icons.search_rounded,
+                    filled: false,
+                    onTap: () => setState(() {
+                      _cari = !_cari;
+                      if (!_cari) _q = '';
+                    }),
                   ),
-                  const SizedBox(height: 12),
-                  Text('Belum ada pesanan $_tab', style: ts(13, c: kMuted)),
+                  const SizedBox(width: 8),
+                  _RoundButton(
+                    icon: Icons.add_rounded,
+                    filled: true,
+                    onTap: _tambah,
+                  ),
                 ],
               ),
-            )
-          else
-            for (final o in list) ...[
-              _OrderCard(
-                order: o,
-                onTap: () => showInfo(context, 'Buka ${o.kode}'),
-              ),
+              if (_cari) ...[
+                const SizedBox(height: 10),
+                TextField(
+                  autofocus: true,
+                  onChanged: (v) => setState(() => _q = v.trim()),
+                  style: ts(13.5),
+                  decoration: InputDecoration(
+                    hintText: 'Cari nama pelanggan atau kode pesanan',
+                    hintStyle: ts(13, c: kMuted),
+                    isDense: true,
+                    filled: true,
+                    fillColor: Colors.white,
+                    prefixIcon: const Icon(Icons.search_rounded,
+                        color: kSlate, size: 19),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: kOutline),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: kOutline),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: kRed),
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: 10),
+              if (q.isEmpty)
+                Container(
+                  decoration: const BoxDecoration(
+                    border: Border(bottom: BorderSide(color: kLine)),
+                  ),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        for (final s in kStatuses)
+                          _Tab(
+                            label: s,
+                            count: count(s),
+                            active: s == _tab,
+                            onTap: () => setState(() => _tab = s),
+                          ),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                Text('Hasil pencarian "$_q"', style: ts(12.5, c: kMuted)),
+              const SizedBox(height: 12),
+              if (list.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 56),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: kTile,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.receipt_long_outlined,
+                            color: kMuted, size: 26),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                          q.isEmpty
+                              ? 'Belum ada pesanan $_tab'
+                              : 'Pesanan tidak ditemukan',
+                          style: ts(13, c: kMuted)),
+                    ],
+                  ),
+                )
+              else
+                for (final o in list) ...[
+                  _OrderCard(order: o, onTap: () => _detail(o)),
+                  const SizedBox(height: 10),
+                ],
             ],
-        ],
-      ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Popup detail pesanan: rincian, ubah status, tandai lunas
+// ---------------------------------------------------------------------------
+
+class _OrderSheet extends StatelessWidget {
+  const _OrderSheet({required this.order});
+  final Order order;
+
+  Widget _baris(String a, String b, {bool tebal = false}) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 3),
+        child: Row(
+          children: [
+            Expanded(child: Text(a, style: ts(13, c: kMuted))),
+            Text(b,
+                style: ts(13, w: tebal ? FontWeight.w700 : FontWeight.w500)),
+          ],
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: AppStore.I,
+      builder: (context, _) {
+        final o = order;
+        return SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+              18, 0, 18, 18 + MediaQuery.paddingOf(context).bottom),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SheetHandle(),
+              Row(
+                children: [
+                  CustomerAvatar(seed: o.nama, pria: o.pria, size: 48),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(o.nama, style: ts(16, w: FontWeight.w600)),
+                        Text('${o.kode}  •  ${o.durasi}',
+                            style: ts(12, c: kMuted)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              for (final i in o.items)
+                _baris('${i.nama}  (${fmtQty(i.qty)} ${i.satuan})',
+                    rupiah(i.subtotal)),
+              const Divider(height: 16, color: kLine),
+              _baris('Total', rupiah(o.total), tebal: true),
+              _baris(
+                  'Pembayaran',
+                  o.bayar == 'Belum Bayar'
+                      ? o.bayar
+                      : '${o.bayar} • ${o.metode}'),
+              if (o.bayar == 'DP') _baris('Sisa', rupiah(o.sisa)),
+              _baris('Masuk', fmtWaktu(o.masuk)),
+              _baris('Perkiraan selesai', fmtWaktu(o.estimasi)),
+              if (o.catatan.isNotEmpty) _baris('Catatan', o.catatan),
+              const SizedBox(height: 14),
+              Text('Ubah status', style: ts(13.5, w: FontWeight.w600)),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final s in kStatuses)
+                    GestureDetector(
+                      onTap: () => AppStore.I.setStatus(o, s),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: s == o.status
+                              ? const Color(0xFFFCE6E4)
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                              color: s == o.status ? kRed : kLine,
+                              width: s == o.status ? 1.5 : 1),
+                        ),
+                        child: Text(s,
+                            style: ts(12.5,
+                                w: FontWeight.w500,
+                                c: s == o.status ? kRed : kInk)),
+                      ),
+                    ),
+                ],
+              ),
+              if (o.bayar != 'Lunas') ...[
+                const SizedBox(height: 16),
+                PrimaryButton(
+                  label: 'TANDAI LUNAS (${rupiah(o.sisa)})',
+                  icon: Icons.payments_outlined,
+                  onTap: () => AppStore.I
+                      .setLunas(o, o.metode.isEmpty ? 'Tunai' : o.metode),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -266,12 +409,13 @@ class _Tab extends StatelessWidget {
 
 class _OrderCard extends StatelessWidget {
   const _OrderCard({required this.order, required this.onTap});
-  final _Order order;
+  final Order order;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final (bg, fg, icon) = _statusStyle(order.status);
+    final berat = order.beratKg;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -321,21 +465,42 @@ class _OrderCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 2),
-                  Text(order.kode, style: ts(11.5, c: kMuted, h: 1.3)),
-                  Text('Masuk: ${order.masuk}',
+                  Text('${order.kode}  •  ${order.durasi}',
+                      style: ts(11.5, c: kMuted, h: 1.3)),
+                  Text('Masuk: ${fmtWaktu(order.masuk)}',
                       style: ts(11.5, c: kMuted, h: 1.3)),
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.checkroom_outlined,
-                          color: kSlate, size: 17),
-                      const SizedBox(width: 6),
-                      Text('${order.layanan} layanan',
-                          style: ts(11.5, c: kMuted)),
-                      const SizedBox(width: 10),
-                      Text('${order.berat.toStringAsFixed(1)} kg',
-                          style: ts(11.5, w: FontWeight.w500)),
-                      const Spacer(),
+                      Expanded(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.checkroom_outlined,
+                                  color: kSlate, size: 17),
+                              const SizedBox(width: 6),
+                              Text('${order.items.length} layanan',
+                                  style: ts(11.5, c: kMuted)),
+                              if (berat > 0) ...[
+                                const SizedBox(width: 10),
+                                Text('${fmtQty(berat)} kg',
+                                    style: ts(11.5, w: FontWeight.w500)),
+                              ],
+                              const SizedBox(width: 8),
+                              if (order.bayar == 'Lunas')
+                                Text('Lunas',
+                                    style: ts(11, w: FontWeight.w600, c: kTealDark))
+                              else
+                                Text(order.bayar,
+                                    style: ts(11, w: FontWeight.w600, c: kRed)),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
                       Text(rupiah(order.total),
                           style: ts(14.5, w: FontWeight.w700)),
                     ],

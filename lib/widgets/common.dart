@@ -439,3 +439,145 @@ class SoftGreyBackground extends StatelessWidget {
     );
   }
 }
+
+// ---------------------------------------------------------------------------
+// Format & kerangka halaman turunan (form, daftar)
+// ---------------------------------------------------------------------------
+
+const _bulanSingkat = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', //
+  'Nov', 'Des',
+];
+
+String _dua(int v) => v.toString().padLeft(2, '0');
+
+/// Contoh: 7 Okt 2026, 19:20
+String fmtWaktu(DateTime d) =>
+    '${d.day} ${_bulanSingkat[d.month - 1]} ${d.year}, '
+    '${_dua(d.hour)}:${_dua(d.minute)}';
+
+/// 2.5 -> "2.5", 3.0 -> "3"
+String fmtQty(double q) =>
+    q == q.roundToDouble() ? q.toStringAsFixed(0) : q.toStringAsFixed(1);
+
+/// Halaman turunan dengan tombol kembali dan judul. Dipakai untuk form dan
+/// daftar yang dibuka dari layar utama.
+class SubPage extends StatelessWidget {
+  const SubPage({
+    super.key,
+    required this.title,
+    required this.body,
+    this.bottom,
+    this.action,
+  });
+
+  final String title;
+  final Widget body;
+  final Widget? bottom;
+  final Widget? action;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+      child: Scaffold(
+        backgroundColor: kBody,
+        bottomNavigationBar: bottom,
+        body: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(4, 4, 12, 4),
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () => Navigator.of(context).maybePop(),
+                      icon: const Icon(Icons.arrow_back_rounded, color: kInk),
+                    ),
+                    Expanded(
+                      child: Text(title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: ts(19, w: FontWeight.w600, c: kRed)),
+                    ),
+                    if (action != null) action!,
+                  ],
+                ),
+              ),
+              Expanded(child: body),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class PrimaryButton extends StatelessWidget {
+  const PrimaryButton({
+    super.key,
+    required this.label,
+    required this.onTap,
+    this.icon,
+    this.enabled = true,
+  });
+
+  final String label;
+  final VoidCallback onTap;
+  final IconData? icon;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: enabled ? onTap : null,
+      child: Container(
+        height: 50,
+        decoration: BoxDecoration(
+          color: enabled ? kRed : const Color(0xFFE5E8ED),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null) ...[
+              Icon(icon,
+                  color: enabled ? Colors.white : kOutline, size: 20),
+              const SizedBox(width: 8),
+            ],
+            Text(label,
+                style: ts(14,
+                        w: FontWeight.w600,
+                        c: enabled ? Colors.white : kOutline)
+                    .copyWith(letterSpacing: .5)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Pegangan kecil di atas popup bawah.
+class SheetHandle extends StatelessWidget {
+  const SheetHandle({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        width: 40,
+        height: 4,
+        margin: const EdgeInsets.only(top: 10, bottom: 14),
+        decoration: BoxDecoration(
+          color: const Color(0xFFD9D9D9),
+          borderRadius: BorderRadius.circular(2),
+        ),
+      ),
+    );
+  }
+}

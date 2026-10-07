@@ -30,6 +30,8 @@ jobs:
           rm -f test/widget_test.dart
           cp -r branding/android/res/. android/app/src/main/res/
           sed -i 's/android:label="ewasho"/android:label="EWASHO"/' android/app/src/main/AndroidManifest.xml
+          sed -i 's|<application|<uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>\n    <application|' android/app/src/main/AndroidManifest.xml
+          grep -n "uses-permission" android/app/src/main/AndroidManifest.xml
 
       - run: flutter pub get
 
