@@ -204,37 +204,18 @@ class EwashoHeader extends StatelessWidget {
   }
 }
 
-/// Logo + nama EWASHO. Ukurannya tetap, dipakai di semua header.
+/// Logo Ewasho (gambar mesin cuci + tulisan). Satu gambar, ukurannya tetap,
+/// dipakai di semua header.
 class EwashoLogo extends StatelessWidget {
   const EwashoLogo({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Image.asset(
-          'assets/images/logo_ewasho.png',
-          width: 42,
-          height: 42,
-          color: kRed,
-          colorBlendMode: BlendMode.srcIn,
-          filterQuality: FilterQuality.medium,
-        ),
-        const SizedBox(width: 6),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('EWASHO',
-                style: ts(19, w: FontWeight.w800, c: kRed, h: 1.05)
-                    .copyWith(letterSpacing: .8)),
-            Text('KASIR LAUNDRY',
-                style: ts(7, w: FontWeight.w500, c: kSlate)
-                    .copyWith(letterSpacing: 2.6)),
-          ],
-        ),
-      ],
+    return Image.asset(
+      'assets/images/logo_ewasho.png',
+      height: 36,
+      fit: BoxFit.contain,
+      filterQuality: FilterQuality.medium,
     );
   }
 }
