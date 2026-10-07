@@ -42,14 +42,13 @@ class _BerandaScreenState extends State<BerandaScreen> {
           _OmsetCard(
             omset: 1250000,
             aksi: [
-              _Aksi('\u{1F9FE}', 'Tambah\nTransaksi',
-                  () => _open('Tambah Transaksi'),
-                  plus: true),
-              _Aksi('\u{1F6F5}', 'Antar\nJemput', () => _open('Antar Jemput')),
-              _Aksi('\u{1F69A}', 'Kurir', () => _open('Kurir')),
-              _Aksi('\u{1F465}', 'Pelanggan', () => _open('Pelanggan')),
-              _Aksi('\u{1F4C5}', 'Hari Ini', () => _open('Hari Ini'), badge: 0),
-              _Aksi('\u{1F916}', 'Chatbot', () => _open('Chatbot')),
+              _Aksi('tambah', 'Tambah\nTransaksi',
+                  () => _open('Tambah Transaksi')),
+              _Aksi('antar', 'Antar\nJemput', () => _open('Antar Jemput')),
+              _Aksi('kurir', 'Kurir', () => _open('Kurir')),
+              _Aksi('pelanggan', 'Pelanggan', () => _open('Pelanggan')),
+              _Aksi('hari', 'Hari Ini', () => _open('Hari Ini'), badge: 0),
+              _Aksi('chatbot', 'Chatbot', () => _open('Chatbot')),
             ],
           ),
           const SizedBox(height: 12),
@@ -84,16 +83,15 @@ class _BerandaScreenState extends State<BerandaScreen> {
 // ---------------------------------------------------------------------------
 
 class _Aksi {
-  const _Aksi(this.emoji, this.label, this.onTap, {this.badge, this.plus = false});
-  final String emoji;
+  const _Aksi(this.icon, this.label, this.onTap, {this.badge});
+
+  /// Nama file ikon di assets/images/menu/ (tanpa ekstensi).
+  final String icon;
   final String label;
   final VoidCallback onTap;
 
   /// Angka di pojok kanan atas (null = tidak ditampilkan).
   final int? badge;
-
-  /// Tanda plus merah kecil di pojok ikon.
-  final bool plus;
 }
 
 class _OmsetCard extends StatelessWidget {
@@ -148,34 +146,13 @@ class _GlassTile extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(4, 12, 4, 8),
                 child: Column(
                   children: [
-                    SizedBox(
-                      width: 46,
-                      height: 42,
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        alignment: Alignment.center,
-                        children: [
-                          Text(data.emoji,
-                              style: const TextStyle(fontSize: 32, height: 1.2)),
-                          if (data.plus)
-                            Positioned(
-                              right: -2,
-                              bottom: 0,
-                              child: Container(
-                                width: 18,
-                                height: 18,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: kRed,
-                                  border:
-                                      Border.all(color: Colors.white, width: 1.5),
-                                ),
-                                child: const Icon(Icons.add_rounded,
-                                    color: Colors.white, size: 13),
-                              ),
-                            ),
-                        ],
-                      ),
+                    Image.asset(
+                      'assets/images/menu/${data.icon}.webp',
+                      width: 50,
+                      height: 44,
+                      fit: BoxFit.contain,
+                      cacheHeight: 168,
+                      filterQuality: FilterQuality.medium,
                     ),
                     const Spacer(),
                     SizedBox(
@@ -216,8 +193,7 @@ class _GlassTile extends StatelessWidget {
   }
 }
 
-/// Kartu omset tembus pandang, sama gayanya dengan kartu di layar Pesanan:
-/// putih transparan + garis tepi putih, tanpa blur dan tanpa warna-warni.
+/// Kartu omset: abu tua polos dengan teks putih.
 class _GlassOmset extends StatelessWidget {
   const _GlassOmset({
     required this.omset,
@@ -234,11 +210,12 @@ class _GlassOmset extends StatelessWidget {
   Widget _stat(int value, String label) => Expanded(
         child: Column(
           children: [
-            Text('$value', style: ts(26, w: FontWeight.w700, h: 1.1)),
+            Text('$value',
+                style: ts(26, w: FontWeight.w700, c: Colors.white, h: 1.1)),
             const SizedBox(height: 6),
             FittedBox(
               fit: BoxFit.scaleDown,
-              child: Text(label, style: ts(13, c: kMuted, h: 1.2)),
+              child: Text(label, style: ts(13, c: wOp(.9), h: 1.2)),
             ),
           ],
         ),
@@ -249,28 +226,28 @@ class _GlassOmset extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
       decoration: BoxDecoration(
-        color: wOp(.62),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white, width: 1.4),
+        color: kDark,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
           Row(
             children: [
-              Text('Omset Hari Ini', style: ts(14.5, c: kSlate, h: 1.2)),
+              Text('Omset Hari Ini', style: ts(14.5, c: Colors.white, h: 1.2)),
               const SizedBox(width: 10),
               Expanded(
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   alignment: Alignment.centerRight,
                   child: Text(rupiah(omset),
-                      style: ts(17, w: FontWeight.w700, h: 1.2)),
+                      style: ts(17,
+                          w: FontWeight.w700, c: Colors.white, h: 1.2)),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 14),
-          Container(height: 1, color: const Color(0xFFDDE2EA)),
+          Container(height: 1, color: wOp(.25)),
           const SizedBox(height: 18),
           Row(
             children: [
