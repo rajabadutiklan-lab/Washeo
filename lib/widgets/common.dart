@@ -396,3 +396,46 @@ class CustomerAvatar extends StatelessWidget {
     );
   }
 }
+
+/// Latar putih dengan variasi abu lembut (digambar sekali, tanpa blur).
+/// Dipakai di layar yang punya kartu tembus pandang.
+class SoftGreyBackground extends StatelessWidget {
+  const SoftGreyBackground({super.key});
+
+  static Widget _blob(double size, Color color) => Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(
+            colors: [color, color.withAlpha(0)],
+            stops: const [.35, 1],
+          ),
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Colors.white, Color(0xFFF1F3F6)],
+        ),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+              top: 120, left: -110, child: _blob(340, const Color(0xFFD3D9E2))),
+          Positioned(
+              top: 300, right: -140, child: _blob(380, const Color(0xFFDCE1E8))),
+          Positioned(
+              top: 560, left: -60, child: _blob(320, const Color(0xFFCFD6E0))),
+          Positioned(
+              top: 760, right: -90, child: _blob(300, const Color(0xFFD8DEE6))),
+        ],
+      ),
+    );
+  }
+}
