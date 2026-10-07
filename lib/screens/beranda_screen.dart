@@ -196,26 +196,26 @@ class _OmsetCardState extends State<_OmsetCard> {
 }
 
 // ---------------------------------------------------------------------------
-// Banner geser (warna datar)
+// Slider: satu judul pendek + ilustrasi, warna datar
 // ---------------------------------------------------------------------------
 
 class _BannerData {
-  const _BannerData(
-      this.kicker, this.title, this.button, this.target, this.color);
-  final String kicker;
+  const _BannerData(this.title, this.asset, this.target, this.color);
   final String title;
-  final String button;
+  final String asset;
   final String target;
   final Color color;
 }
 
 const _banners = [
-  _BannerData('Kelola usaha laundry lebih mudah',
-      'Laundry Rapi, Pelanggan Happy', 'Lihat Tutorial', 'Tutorial', kTealDark),
-  _BannerData('Harian, mingguan dan bulanan otomatis',
-      'Pantau Omset Setiap Saat', 'Lihat Laporan', 'Laporan', kOrange),
-  _BannerData('Printer thermal 58 mm dan 80 mm', 'Cetak Struk Sekali Tekan',
-      'Atur Printer', 'Pengaturan', kDark),
+  _BannerData('Laundry Rapi,\nPelanggan Happy', 'slider_pesanan', 'Tutorial',
+      kTealDark),
+  _BannerData('Bayar Pakai\nQRIS', 'slider_qris', 'QRIS', kDark),
+  _BannerData('Pantau Omset\nSetiap Saat', 'slider_laporan', 'Laporan',
+      kTealDark),
+  _BannerData('Kelola Banyak\nCabang', 'slider_cabang', 'Manajemen Cabang',
+      kDark),
+  _BannerData('Notifikasi\nWhatsApp', 'slider_whatsapp', 'Otomasi', kTealDark),
 ];
 
 class _BannerCarousel extends StatefulWidget {
@@ -241,7 +241,7 @@ class _BannerCarouselState extends State<_BannerCarousel> {
     return Column(
       children: [
         SizedBox(
-          height: 124,
+          height: 150,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: PageView.builder(
@@ -287,55 +287,24 @@ class _BannerSlide extends StatelessWidget {
       onTap: onTap,
       child: Container(
         color: data.color,
-        padding: const EdgeInsets.fromLTRB(18, 0, 10, 0),
+        padding: const EdgeInsets.fromLTRB(20, 10, 14, 10),
         child: Row(
           children: [
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(data.kicker,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: ts(12, c: Colors.white, h: 1.25)),
-                  const SizedBox(height: 2),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Text(data.title,
-                        style: ts(16.5,
-                            w: FontWeight.w700, c: Colors.white, h: 1.25)),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(data.button,
-                          style:
-                              ts(12.5, w: FontWeight.w600, c: Colors.white)),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.arrow_forward_rounded,
-                          color: Colors.white, size: 16),
-                    ],
-                  ),
-                ],
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(data.title,
+                    style: ts(19, w: FontWeight.w700, c: Colors.white, h: 1.25)),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 10),
             Image.asset(
-              'assets/images/banner_laundry.png',
-              width: 96,
-              height: 96,
+              'assets/images/${data.asset}.webp',
+              width: 150,
+              height: 130,
               fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => Container(
-                width: 84,
-                height: 84,
-                decoration:
-                    BoxDecoration(shape: BoxShape.circle, color: wOp(.14)),
-                child: const Icon(Icons.local_laundry_service_outlined,
-                    size: 46, color: Colors.white),
-              ),
+              filterQuality: FilterQuality.medium,
             ),
           ],
         ),
